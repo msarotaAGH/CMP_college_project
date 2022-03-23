@@ -1,3 +1,167 @@
+function Activity(configs) {
+  var self = this;
+  configs = configs || {};
+  self.id = configs.id;
+  self.duration = configs.duration;
+  self.est = configs.est; //Earliest Start Time
+  self.lst = configs.lst; //Latest Start Time
+  self.eet = configs.eet; //Earliest End Time
+  self.let = configs.let; //Latest End Time
+  self.h = configs.h; //clearance (holgura)
+  self.successors = [];
+  self.predecessors = configs.predecessors || [];
+  return self;
+}
+
+function ActivityList() {
+  var self = this;
+  var processed = false;
+  var list = {};
+  var start, end;
+
+  self.addActivity = function (activity) {
+    list[activity.id] = activity;
+  };
+
+  function processList() {
+    if (processed) {
+      return;
+    }
+    processed = true;
+
+    start = new Activity({ id: "start", duration: 0 });
+
+    //Replaces id for pointers to actvities
+    for (var i in list) {
+      var current = list[i];
+      var predecessorsIds = current.predecessors;
+      var predecessors = [];
+
+      if (predecessorsIds.length == 0) {
+        predecessors.push(start);
+        start.successors.push(current);
+      } else {
+        for (var j in predecessorsIds) {
+          var previous = list[predecessorsIds[j]];
+          if (!previous) {
+            throw new Error("Node " + j + " dont exists");
+          }
+          predecessors.push(previous);
+          previous.successors.push(current);
+        }
+      }
+      current.predecessors = predecessors;
+    }
+  }
+
+  function setEarlyTimes(root) {
+    for (var i in root.successors) {
+      var node = root.successors[i];
+
+      var predesessors = node.predecessors;
+      for (var j in predesessors) {
+        var activity = predesessors[j];
+        if (node.est == null || node.est < activity.eet)
+          node.est = activity.eet;
+      }
+      node.eet = node.est + node.duration;
+      setEarlyTimes(node);
+    }
+  }
+
+  function setLateTimes(root) {
+    if (root.successors.length == 0) {
+      root.let = root.eet;
+      root.lst = root.let - root.duration;
+      root.h = root.eet - root.let;
+    } else {
+      for (var i in root.successors) {
+        var node = root.successors[i];
+        setLateTimes(node);
+        if (root.let == null || root.let > node.lst) {
+          root.let = node.lst;
+        }
+      }
+
+      root.lst = root.let - root.duration;
+      root.h = root.let - root.eet;
+    }
+  }
+
+  function buildCriticalPath(root, path) {
+    if (root.h == 0) {
+      var predecessors = root.predecessors;
+      for (var i in predecessors) {
+        var node = predecessors[i];
+        if (node.h == 0) {
+          var clone = new Activity({
+            id: node.id,
+            duration: node.duration,
+            est: node.est,
+            lst: node.lst,
+            eet: node.eet,
+            let: node.let,
+            h: node.h,
+          });
+          if (node !== start) {
+            path.predecessors.push(clone);
+            buildCriticalPath(node, clone);
+          }
+        }
+      }
+    }
+  }
+
+  self.getCriticalPath = function (endid) {
+    if (!endid) {
+      throw new Error("End activity id is required!");
+    }
+    end = list[endid];
+    if (!end) {
+      throw new Error("Node end dont not match");
+    }
+    processList();
+
+    start.est = 0;
+    start.eet = 0;
+    setEarlyTimes(start);
+
+    //Setup End Times
+    end.let = end.eet;
+    end.lst = end.let - end.duration;
+    end.h = end.eet - end.let;
+    setLateTimes(start);
+
+    //Assemble Critical Path (tree)
+    var path = null;
+    if (end.h == 0) {
+      var path = new Activity({
+        id: end.id,
+        duration: end.duration,
+        est: end.est,
+        lst: end.lst,
+        eet: end.eet,
+        let: end.let,
+        h: end.h,
+      });
+
+      buildCriticalPath(end, path);
+    }
+    return path;
+  };
+
+  self.getList = function () {
+    processList();
+    return list;
+  };
+
+  self.getListAsArray = () => {
+    processList();
+    return Object.values(list);
+  };
+  return self;
+}
+
 $(document).ready(function () {
   $(".dropdown-toggle").dropdown();
 
@@ -28,6 +192,9 @@ $(document).ready(function () {
   });
 });
 
+//docelowe miejsce na zapisywanie kolejnych krokow
+var activityList= new ActivityList();
+
 var addActivityBtn = document.getElementById("addActivityBtn");
 var removeActivityBtn = document.getElementById("removeActivityBtn");
 var calculateBtn = document.getElementById("calculateBtn");
@@ -37,6 +204,167 @@ var actList = document.getElementById("actList");
 
 var table = document.getElementById("tableBody");
 var counter = 1;
+
+
+parseArray = (cpmList) => {
+  console.log("TABLE 3", cpmList);
+  var returnArray = [];
+  for (var listElement = 0; listElement < cpmList.length; listElement++) {
+    var nodeObject = new Object();
+    var data = new Object();
+    nodeObject.data = data;
+    var currentObject = cpmList[listElement];
+    var id = currentObject.id;
+    var duration = currentObject.duration;
+    var successors = currentObject.successors;
+
+    nodeObject.data.id = id;
+    nodeObject.data.duration = duration;
+    nodeObject.data.backgroundColor="#6c757d";
+    returnArray.push(nodeObject);
+
+    for (var iter = 0; iter < successors.length; iter++) {
+      var edgeObject = new Object();
+      var data = new Object();
+      edgeObject.data = data;
+      edgeObject.data.id = id + successors[iter].id;
+      edgeObject.data.source = id;
+      edgeObject.data.target = successors[iter].id;
+      edgeObject.data.color = "#0d6efd";
+      returnArray.push(edgeObject);
+    }
+  }
+  return returnArray;
+};
+
+getData = () => {
+  //docelowo odbieranie z arraya populowanego przy dodawaniu zwyklym
+  //tymczasowo zadanie 2 CPM
+  var table3 = new ActivityList();
+
+  table3.addActivity(
+    new Activity({
+      id: "A",
+      duration: 5,
+    })
+  );
+
+  table3.addActivity(
+    new Activity({
+      id: "B",
+      duration: 3,
+      predecessors: ["A"],
+    })
+  );
+
+  table3.addActivity(
+    new Activity({
+      id: "C",
+      duration: 4,
+    })
+  );
+
+  table3.addActivity(
+    new Activity({
+      id: "D",
+      duration: 6,
+      predecessors: ["A"],
+    })
+  );
+
+  table3.addActivity(
+    new Activity({
+      id: "E",
+      duration: 4,
+      predecessors: ["D"],
+    })
+  );
+
+  table3.addActivity(
+    new Activity({
+      id: "F",
+      duration: 3,
+      predecessors: ["B", "C", "D"],
+    })
+  );
+  return table3;
+  
+};
+markEdges = (graphArray, path) => {
+  var currentObject = path;
+  var edgeArray = [];
+  while (true) {
+    var predecessors=currentObject.predecessors;
+    if (predecessors.length != 0 && predecessors!= undefined && predecessors!= typeof(undefined)) {
+      var edgeObject = new Object();
+      edgeObject.source = predecessors[0].id;
+      edgeObject.target = currentObject.id;
+      edgeArray.push(edgeObject);
+      currentObject = predecessors[0];
+    } else break;
+  }
+
+  for(var currentEdge=0;currentEdge<graphArray.length;currentEdge++){
+
+    if(graphArray[currentEdge].data.source!=undefined && graphArray[currentEdge].data.source!= typeof(undefined) && graphArray[currentEdge].data.target!=undefined && graphArray[currentEdge].data.target!= typeof(undefined)){
+
+      for(var redEdge=0;redEdge<edgeArray.length;redEdge++){
+
+        if(edgeArray[redEdge].source==graphArray[currentEdge].data.source && edgeArray[redEdge].target==graphArray[currentEdge].data.target){
+          graphArray[currentEdge].data.color="red"
+        }
+      }
+    }
+  }
+
+  return graphArray;
+};
+displayGraph = (data) => {
+  var cy = cytoscape({
+    container: document.getElementById("cyGraph"),
+    elements: data,
+    style: [
+      // the stylesheet for the graph
+      {
+        selector: "node",
+        style: {
+          "background-color": "data(backgroundColor)",
+          label: function (element) {
+            return `${element.data("id")} ${element.data("duration")}`;
+          },
+        },
+      },
+
+      {
+        selector: "edge",
+        style: {
+          width: 3,
+          "target-arrow-color": "data(color)",
+          "target-arrow-shape": "triangle",
+          "curve-style": "bezier",
+          lineColor: "data(color)",
+        },
+      },
+    ],
+
+    layout: {
+      name: "grid",
+      rows: 1,
+    },
+  });
+};
+algorithm = () => {
+  //var data = getData(activityList);
+  var data = getData();
+  var graphArray = parseArray(data.getListAsArray());
+  console.log(graphArray);
+  var path = data.getCriticalPath("F");
+  graphArray=markEdges(graphArray,path);
+
+  console.log(path);
+  displayGraph(graphArray);
+};
+
 
 addActivityBtn.addEventListener("click", function () {
   var row = document.createElement("tr");
@@ -128,91 +456,3 @@ calculateBtn.addEventListener("click", function () {
 //  $(document).on('click', '.allow-focus', function (e) {
 //    e.stopPropagation();
 //  });
-
-getData = () => {
-    //tymczasowo zadanie 2 CPM
-  return [
-    {
-      data: { id: "a", duration: 5 },
-    },
-    {
-      data: { id: "b", duration: 3 },
-    },
-    {
-      data: { id: "c", duration: 4 },
-    },
-    {
-      data: { id: "d", duration: 6 },
-    },
-    {
-      data: { id: "e", duration: 4 },
-    },
-    {
-      data: { id: "f", duration: 3 },
-    },
-    {
-      // edge ab
-      data: { id: "ab", source: "a", target: "b" },
-    },
-    {
-      // edge ad
-      data: { id: "ad", source: "a", target: "d" },
-    },
-    {
-      // edge de
-      data: { id: "de", source: "d", target: "e" },
-    },
-    {
-      // edge fb
-      data: { id: "fb", source: "b", target: "f" },
-    },
-    {
-      // edge fc
-      data: { id: "fc", source: "c", target: "f" },
-    },
-    {
-      // edge fd
-      data: { id: "fd", source: "d", target: "f" },
-    },
-  ];
-};
-algorithm = () => {
-  var data = getData();
-
-  displayGraph(data);
-};
-displayGraph = (data) => {
-  var cy = cytoscape({
-    container: document.getElementById("cyGraph"),
-    elements: data,
-    style: [
-      // the stylesheet for the graph
-      {
-        selector: "node",
-        style: {
-          "background-color": "#666",
-           label: function (element) { 
-            return `${element.data("id")} ${element.data("duration")}`
-        },
-        },
-      },
-
-      {
-        selector: "edge",
-        style: {
-          width: 3,
-          "line-color": "#ccc",
-          "target-arrow-color": "#ccc",
-          "target-arrow-shape": "triangle",
-          "curve-style": "bezier",
-          label: "data(duration)",
-        },
-      },
-    ],
-
-    layout: {
-      name: "grid",
-      rows: 1,
-    },
-  });
-};
