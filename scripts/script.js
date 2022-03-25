@@ -201,6 +201,8 @@ var calculateBtn = document.getElementById("calculateBtn");
 var resultDiv = document.getElementById("resultDiv");
 var resultText = document.getElementById("resultText");
 var actList = document.getElementById("actList");
+// var graph = document.getElementsByClassName("graph");
+var graph = document.getElementById("cyGraph");
 
 var table = document.getElementById("tableBody");
 var counter = 1;
@@ -389,13 +391,36 @@ addActivityBtn.addEventListener("click", function () {
   cell[2].setAttribute("id", "actTime");
   cell[2].textContent = timeInput.value;
 
-  cell[3].setAttribute("id", "actPreceding");
+  if(counter == 1){
+    cell[3].setAttribute("id", "actPreceding");
+    cell[3].textContent = "";
+  } else {
+    var checkboxes = document.querySelectorAll('input[name="actSelected"]:checked');
+    if(checkboxes.length > 0){
+      var cbValues = [];
+    checkboxes.forEach((checkbox) => {
+      cbValues.push(checkbox.value.toString());
+    })
 
+    var precedingString = "";
+    for(var i=0; i < cbValues.length - 1; i++){
+      console.log(cbValues[i]);
+      cell[3].textContent += cbValues[i] + ', ';
+    }
+    cell[3].textContent += cbValues[cbValues.length - 1];
+    console.log(cbValues[cbValues.length-1]);
+    } else {
+      cell[3].textContent = "";
+    }
+  }
+  
   var li = document.createElement("li");
   var label = document.createElement("label");
-  var input = document.createElement("input");
   var t = document.createTextNode("\u00A0");
+  var input = document.createElement("input");
+  input.value = actInput.value;
   input.type = "checkbox";
+  input.name = "actSelected";
   input.id = counter;
   label.appendChild(t);
   label.appendChild(input);
@@ -412,6 +437,7 @@ addActivityBtn.addEventListener("click", function () {
 removeActivityBtn.addEventListener("click", function () {
   var rowsLength = table.rows.length;
   table.deleteRow(rowsLength - 1);
+  actList.removeChild(actList.lastChild);
   if (rowsLength >= 1) {
     counter--;
   }
@@ -422,9 +448,19 @@ calculateBtn.addEventListener("click", function () {
   var info = `The result is ${result}`;
   resultText.textContent = info;
   //resultDiv.style.display = "block";
+  //styling the result div
   resultDiv.style.height = "50px";
   resultDiv.style.opacity = "100%";
   resultDiv.style.transition = "height .5s, opacity 1s";
+  //styling the graph div
+  // if(!graph.classList.contains('graph-show')){
+  // }
+  graph.classList.add('graph-show');
+  // graph.style.height = ""
+  // graph.style.height = "400px";
+  // graph.style.opacity = "100%";
+  // graph.style.transition = "height .5s, opacity 1s";
+
   algorithm();
 });
 
