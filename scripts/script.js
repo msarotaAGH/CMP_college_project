@@ -193,7 +193,11 @@ $(document).ready(function () {
 });
 
 //docelowe miejsce na zapisywanie kolejnych krokow
-var activityList= new ActivityList();
+var activityList = new ActivityList();
+// var nact = new Activity({
+//   id: 
+// })
+// activityList.addActivity()
 
 var addActivityBtn = document.getElementById("addActivityBtn");
 var removeActivityBtn = document.getElementById("removeActivityBtn");
@@ -202,10 +206,13 @@ var resultDiv = document.getElementById("resultDiv");
 var resultText = document.getElementById("resultText");
 var actList = document.getElementById("actList");
 // var graph = document.getElementsByClassName("graph");
-var graph = document.getElementById("cyGraph");
+// var graph = document.getElementById("cyGraph");
+var graph = document.getElementsByClassName("graph");
 
 var table = document.getElementById("tableBody");
 var counter = 1;
+
+//activity object 
 
 
 parseArray = (cpmList) => {
@@ -242,54 +249,92 @@ parseArray = (cpmList) => {
 getData = () => {
   //docelowo odbieranie z arraya populowanego przy dodawaniu zwyklym
   //tymczasowo zadanie 2 CPM
-  var table3 = new ActivityList();
+  // var table3 = new ActivityList();
 
-  table3.addActivity(
-    new Activity({
-      id: "A",
-      duration: 5,
-    })
-  );
+  // var actId = 0;
+  // var actDur = 0;
+  // var actPredecessors = [];
 
-  table3.addActivity(
-    new Activity({
-      id: "B",
-      duration: 3,
-      predecessors: ["A"],
-    })
-  );
+  // for(let i in table.rows) {
+  //   let row = table.rows[i];
+  //   actId = row.cells[1];
+  //   actDur = row.cells[2];
+  //   actPredecessors
+  //   for(let j in row.cells) {
+  //     let col = row.cells[j];
 
-  table3.addActivity(
-    new Activity({
-      id: "C",
-      duration: 4,
-    })
-  );
+  //   }
+  // }
 
-  table3.addActivity(
-    new Activity({
-      id: "D",
-      duration: 6,
-      predecessors: ["A"],
-    })
-  );
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "a",
+  //     duration: 1,
+  //   })
+  // );
 
-  table3.addActivity(
-    new Activity({
-      id: "E",
-      duration: 4,
-      predecessors: ["D"],
-    })
-  );
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "b",
+  //     duration: 1,
+  //     predecessors: ["a"],
+  //   })
+  // );
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "c",
+  //     duration: 1,
+  //     predecessors: ["b"],
+  //   })
+  // );
 
-  table3.addActivity(
-    new Activity({
-      id: "F",
-      duration: 3,
-      predecessors: ["B", "C", "D"],
-    })
-  );
-  return table3;
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "A",
+  //     duration: 5,
+  //   })
+  // );
+
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "B",
+  //     duration: 3,
+  //     predecessors: ["A"],
+  //   })
+  // );
+
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "C",
+  //     duration: 4,
+  //   })
+  // );
+
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "D",
+  //     duration: 6,
+  //     predecessors: ["A"],
+  //   })
+  // );
+
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "E",
+  //     duration: 4,
+  //     predecessors: ["D"],
+  //   })
+  // );
+
+  // table3.addActivity(
+  //   new Activity({
+  //     id: "F",
+  //     duration: 3,
+  //     predecessors: ["B", "C", "D"],
+  //   })
+  // );
+  // return table3;
+  return activityList;
   
 };
 markEdges = (graphArray, path) => {
@@ -355,12 +400,18 @@ displayGraph = (data) => {
     },
   });
 };
+
 algorithm = () => {
   //var data = getData(activityList);
   var data = getData();
   var graphArray = parseArray(data.getListAsArray());
   console.log(graphArray);
-  var path = data.getCriticalPath("F");
+
+  console.log("tutaj");
+  console.log(graphArray[graphArray.length - 1].data.id);
+  var path = data.getCriticalPath(graphArray[graphArray.length - 1].data.id);
+  // var path = data.getCriticalPath("F");
+  console.log(path);
   graphArray=markEdges(graphArray,path);
 
   console.log(path);
@@ -369,6 +420,10 @@ algorithm = () => {
 
 
 addActivityBtn.addEventListener("click", function () {
+
+  //lokalnie nowy obiekt activity
+  //na koncu dodawany do ActivityList
+
   var row = document.createElement("tr");
   row.setAttribute("id", counter);
 
@@ -387,9 +442,12 @@ addActivityBtn.addEventListener("click", function () {
 
   cell[1].setAttribute("id", "actName");
   cell[1].textContent = actInput.value;
+  var nai = actInput.value;
 
   cell[2].setAttribute("id", "actTime");
   cell[2].textContent = timeInput.value;
+  var nad = parseInt(timeInput.value);
+  var nap = [];
 
   if(counter == 1){
     cell[3].setAttribute("id", "actPreceding");
@@ -404,11 +462,15 @@ addActivityBtn.addEventListener("click", function () {
 
     var precedingString = "";
     for(var i=0; i < cbValues.length - 1; i++){
-      console.log(cbValues[i]);
       cell[3].textContent += cbValues[i] + ', ';
+      // newActivity.predecessors.push(cbValues[i]);
+      nap.push(cbValues[i]);
+      // newActivity.predecessors[i] = cbValues[i];
     }
     cell[3].textContent += cbValues[cbValues.length - 1];
-    console.log(cbValues[cbValues.length-1]);
+    // newActivity.predecessors.push(cbValues[cbValues.length - 1]);
+    nap.push(cbValues[cbValues.length - 1]);
+    // newActivity.predecessors[l]
     } else {
       cell[3].textContent = "";
     }
@@ -431,37 +493,73 @@ addActivityBtn.addEventListener("click", function () {
   actList.appendChild(li);
 
   table.appendChild(row);
+
+  //dodanie utworzonego tutaj obiektu Activity do globalnej ActivityList
+  activityList.addActivity(new Activity({
+    id: nai,
+    duration: parseInt(nad),
+    predecessors: nap,
+  }));
+  // console.log(newActivity.id);
+  // console.log(newActivity.duration);
+  // console.log(newActivity.predecessors);
+  // var al = activityList.getListAsArray();
+  // console.log(al.length);
+  // for(var i=0; i < al.length; i++) {
+  //   var act = al[i];
+  //   console.log(act.id);
+  //   console.log(act.duration);
+  //   console.log(act.predecessors);
+  //   console.log("ay");
+  // }
   counter++;
 });
 
 removeActivityBtn.addEventListener("click", function () {
   var rowsLength = table.rows.length;
-  table.deleteRow(rowsLength - 1);
-  actList.removeChild(actList.lastChild);
-  if (rowsLength >= 1) {
+  if(rowsLength > 0){
+    table.deleteRow(rowsLength - 1);
+    actList.removeChild(actList.lastChild);
     counter--;
   }
+  // if (rowsLength >= 1) {
+  //   counter--;
+  // }
 });
 
-calculateBtn.addEventListener("click", function () {
-  var result = 0;
-  var info = `The result is ${result}`;
-  resultText.textContent = info;
-  //resultDiv.style.display = "block";
-  //styling the result div
-  resultDiv.style.height = "50px";
-  resultDiv.style.opacity = "100%";
-  resultDiv.style.transition = "height .5s, opacity 1s";
-  //styling the graph div
-  // if(!graph.classList.contains('graph-show')){
-  // }
-  graph.classList.add('graph-show');
-  // graph.style.height = ""
-  // graph.style.height = "400px";
-  // graph.style.opacity = "100%";
-  // graph.style.transition = "height .5s, opacity 1s";
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+}
 
-  algorithm();
+calculateBtn.addEventListener("click", function () {
+  if(table.rows.length > 0){
+    var result = 'hhe';
+    var info = `The result is ${result}`;
+    resultText.textContent = info;
+    //resultDiv.style.display = "block";
+    //styling the result div
+    resultDiv.style.height = "50px";
+    resultDiv.style.opacity = "100%";
+    resultDiv.style.transition = "height .5s, opacity 1s";
+    //styling the graph div
+    // if(!graph.classList.contains('graph-show')){
+    // }
+    // document.getElementById('graph').classList.add('graph-show');
+    graph[0].classList.add('graph-show');
+    graph[0].setAttribute('id', 'cyGraph');
+    // sleep(1000);
+
+    // graph.style.height = ""
+    // graph.style.height = "400px";
+    // graph.style.opacity = "100%";
+    // graph.style.transition = "height .5s, opacity 1s";
+  
+    algorithm();
+  }
 });
 
 //data validation

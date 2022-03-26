@@ -58,6 +58,7 @@ h1 {
         height: 2px;
         width: 40%;
         top: 0;
+        box-shadow: 0 -2px 50px black;
     }
     
     .border-bottom {
@@ -87,7 +88,6 @@ h1 {
         top: 0;
     }
 }
-
 
 .graph-show {
     height: 500px;

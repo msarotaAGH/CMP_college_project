@@ -63,6 +63,8 @@ h1 span {
   height: 2px;
   width: 40%;
   top: 0;
+  -webkit-box-shadow: 0 -2px 50px black;
+          box-shadow: 0 -2px 50px black;
 }
 
 .graph .border-bottom {
