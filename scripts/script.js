@@ -22,7 +22,17 @@ function ActivityList() {
   self.addActivity = function (activity) {
     list[activity.id] = activity;
   };
-
+  self.removeLastActivity = function () {
+    var objects = Object.keys(list)
+    var key=objects[objects.length-1]
+    delete list[key]
+  };
+  self.doesListContain = function(key){
+    if (key in list)
+      return true
+    else
+      return false
+  }
   function processList() {
     if (processed) {
       return;
@@ -194,26 +204,18 @@ $(document).ready(function () {
 
 //docelowe miejsce na zapisywanie kolejnych krokow
 var activityList = new ActivityList();
-// var nact = new Activity({
-//   id: 
-// })
-// activityList.addActivity()
-
 var addActivityBtn = document.getElementById("addActivityBtn");
 var removeActivityBtn = document.getElementById("removeActivityBtn");
 var calculateBtn = document.getElementById("calculateBtn");
 var resultDiv = document.getElementById("resultDiv");
 var resultText = document.getElementById("resultText");
 var actList = document.getElementById("actList");
-// var graph = document.getElementsByClassName("graph");
-// var graph = document.getElementById("cyGraph");
 var graph = document.getElementsByClassName("graph");
 
 var table = document.getElementById("tableBody");
 var counter = 1;
-
-//activity object 
-
+let criticalPath = [];
+//activity object
 
 parseArray = (cpmList) => {
   console.log("TABLE 3", cpmList);
@@ -229,18 +231,20 @@ parseArray = (cpmList) => {
 
     nodeObject.data.id = id;
     nodeObject.data.duration = duration;
-    nodeObject.data.backgroundColor="#6c757d";
+    nodeObject.data.backgroundColor = "#6c757d";
     returnArray.push(nodeObject);
 
     for (var iter = 0; iter < successors.length; iter++) {
-      var edgeObject = new Object();
-      var data = new Object();
-      edgeObject.data = data;
-      edgeObject.data.id = id + successors[iter].id;
-      edgeObject.data.source = id;
-      edgeObject.data.target = successors[iter].id;
-      edgeObject.data.color = "#0d6efd";
-      returnArray.push(edgeObject);
+      if (activityList.doesListContain(successors[iter].id)){
+        var edgeObject = new Object();
+        var data = new Object();
+        edgeObject.data = data;
+        edgeObject.data.id = id + successors[iter].id;
+        edgeObject.data.source = id;
+        edgeObject.data.target = successors[iter].id;
+        edgeObject.data.color = "#0d6efd";
+        returnArray.push(edgeObject);
+      }
     }
   }
   return returnArray;
@@ -249,7 +253,6 @@ parseArray = (cpmList) => {
 getData = () => {
   //docelowo odbieranie z arraya populowanego przy dodawaniu zwyklym
   //tymczasowo zadanie 2 CPM
-  // var table3 = new ActivityList();
 
   // var actId = 0;
   // var actDur = 0;
@@ -265,29 +268,7 @@ getData = () => {
 
   //   }
   // }
-
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "a",
-  //     duration: 1,
-  //   })
-  // );
-
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "b",
-  //     duration: 1,
-  //     predecessors: ["a"],
-  //   })
-  // );
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "c",
-  //     duration: 1,
-  //     predecessors: ["b"],
-  //   })
-  // );
-
+  // var table3 = new ActivityList();
   // table3.addActivity(
   //   new Activity({
   //     id: "A",
@@ -335,14 +316,22 @@ getData = () => {
   // );
   // return table3;
   return activityList;
-  
 };
 markEdges = (graphArray, path) => {
+  if (path === null) return null;
   var currentObject = path;
   var edgeArray = [];
-  while (true) {
-    var predecessors=currentObject.predecessors;
-    if (predecessors.length != 0 && predecessors!= undefined && predecessors!= typeof(undefined)) {
+  while (
+    currentObject.predecessors !== null &&
+    currentObject.predecessors !== undefined &&
+    currentObject.predecessors !== typeof undefined
+  ) {
+    var predecessors = currentObject.predecessors;
+    if (
+      predecessors.length != 0 &&
+      predecessors != undefined &&
+      predecessors != typeof undefined
+    ) {
       var edgeObject = new Object();
       edgeObject.source = predecessors[0].id;
       edgeObject.target = currentObject.id;
@@ -350,21 +339,41 @@ markEdges = (graphArray, path) => {
       currentObject = predecessors[0];
     } else break;
   }
-
-  for(var currentEdge=0;currentEdge<graphArray.length;currentEdge++){
-
-    if(graphArray[currentEdge].data.source!=undefined && graphArray[currentEdge].data.source!= typeof(undefined) && graphArray[currentEdge].data.target!=undefined && graphArray[currentEdge].data.target!= typeof(undefined)){
-
-      for(var redEdge=0;redEdge<edgeArray.length;redEdge++){
-
-        if(edgeArray[redEdge].source==graphArray[currentEdge].data.source && edgeArray[redEdge].target==graphArray[currentEdge].data.target){
-          graphArray[currentEdge].data.color="red"
+  for (var currentEdge = 0; currentEdge < graphArray.length; currentEdge++) {
+    if (
+      graphArray[currentEdge].data.source != undefined &&
+      graphArray[currentEdge].data.source != typeof undefined &&
+      graphArray[currentEdge].data.target != undefined &&
+      graphArray[currentEdge].data.target != typeof undefined
+    ) {
+      for (var redEdge = 0; redEdge < edgeArray.length; redEdge++) {
+        if (
+          edgeArray[redEdge].source == graphArray[currentEdge].data.source &&
+          edgeArray[redEdge].target == graphArray[currentEdge].data.target
+        ) {
+          graphArray[currentEdge].data.color = "red";
         }
       }
     }
   }
 
   return graphArray;
+};
+parsePath = (path) => {
+  if (path === null) return null;
+  var returnArray = [];
+  var currentObject = path;
+  while (currentObject !== undefined) {
+    returnArray.unshift(currentObject.id);
+    if (
+      currentObject.predecessors === undefined ||
+      currentObject.predecessors === null ||
+      currentObject.predecessors === typeof undefined
+    )
+      break;
+    else currentObject = currentObject.predecessors[0];
+  }
+  return returnArray;
 };
 displayGraph = (data) => {
   var cy = cytoscape({
@@ -395,32 +404,54 @@ displayGraph = (data) => {
     ],
 
     layout: {
-      name: "grid",
+      name: "breadthfirst",
       rows: 1,
     },
+  });
+  cy.ready(function () {
+    cy.fit();
   });
 };
 
 algorithm = () => {
-  //var data = getData(activityList);
   var data = getData();
   var graphArray = parseArray(data.getListAsArray());
   console.log(graphArray);
-
-  console.log("tutaj");
-  console.log(graphArray[graphArray.length - 1].data.id);
   var path = data.getCriticalPath(graphArray[graphArray.length - 1].data.id);
-  // var path = data.getCriticalPath("F");
-  console.log(path);
-  graphArray=markEdges(graphArray,path);
-
+  graphArray = markEdges(graphArray, path);
+  criticalPath = parsePath(path);
   console.log(path);
   displayGraph(graphArray);
+  fillTable(data.getListAsArray());
+};
+fillTable = (nodes) => {
+  var table = document.getElementById("resultBody");
+  removeTableRows(table);
+  for (var i = 0; i < nodes.length; i++) {
+    var tr = document.createElement("tr");
+    var id = document.createElement("td");
+    id.innerText = nodes[i].id;
+    var duration = document.createElement("td");
+    duration.innerText = nodes[i].duration;
+    var est = document.createElement("td");
+    est.innerText = nodes[i].est;
+    var eet = document.createElement("td");
+    eet.innerText = nodes[i].eet;
+    var lst = document.createElement("td");
+    lst.innerText = nodes[i].lst;
+    var LeT = document.createElement("td");
+    LeT.innerText = nodes[i].let;
+    tr.appendChild(id);
+    tr.appendChild(duration);
+    tr.appendChild(est);
+    tr.appendChild(eet);
+    tr.appendChild(lst);
+    tr.appendChild(LeT);
+    table.appendChild(tr);
+  }
 };
 
-
 addActivityBtn.addEventListener("click", function () {
-
   //lokalnie nowy obiekt activity
   //na koncu dodawany do ActivityList
 
@@ -449,33 +480,35 @@ addActivityBtn.addEventListener("click", function () {
   var nad = parseInt(timeInput.value);
   var nap = [];
 
-  if(counter == 1){
+  if (counter == 1) {
     cell[3].setAttribute("id", "actPreceding");
     cell[3].textContent = "";
   } else {
-    var checkboxes = document.querySelectorAll('input[name="actSelected"]:checked');
-    if(checkboxes.length > 0){
+    var checkboxes = document.querySelectorAll(
+      'input[name="actSelected"]:checked'
+    );
+    if (checkboxes.length > 0) {
       var cbValues = [];
-    checkboxes.forEach((checkbox) => {
-      cbValues.push(checkbox.value.toString());
-    })
+      checkboxes.forEach((checkbox) => {
+        cbValues.push(checkbox.value.toString());
+      });
 
-    var precedingString = "";
-    for(var i=0; i < cbValues.length - 1; i++){
-      cell[3].textContent += cbValues[i] + ', ';
-      // newActivity.predecessors.push(cbValues[i]);
-      nap.push(cbValues[i]);
-      // newActivity.predecessors[i] = cbValues[i];
-    }
-    cell[3].textContent += cbValues[cbValues.length - 1];
-    // newActivity.predecessors.push(cbValues[cbValues.length - 1]);
-    nap.push(cbValues[cbValues.length - 1]);
-    // newActivity.predecessors[l]
+      var precedingString = "";
+      for (var i = 0; i < cbValues.length - 1; i++) {
+        cell[3].textContent += cbValues[i] + ", ";
+        // newActivity.predecessors.push(cbValues[i]);
+        nap.push(cbValues[i]);
+        // newActivity.predecessors[i] = cbValues[i];
+      }
+      cell[3].textContent += cbValues[cbValues.length - 1];
+      // newActivity.predecessors.push(cbValues[cbValues.length - 1]);
+      nap.push(cbValues[cbValues.length - 1]);
+      // newActivity.predecessors[l]
     } else {
       cell[3].textContent = "";
     }
   }
-  
+
   var li = document.createElement("li");
   var label = document.createElement("label");
   var t = document.createTextNode("\u00A0");
@@ -495,11 +528,13 @@ addActivityBtn.addEventListener("click", function () {
   table.appendChild(row);
 
   //dodanie utworzonego tutaj obiektu Activity do globalnej ActivityList
-  activityList.addActivity(new Activity({
-    id: nai,
-    duration: parseInt(nad),
-    predecessors: nap,
-  }));
+  activityList.addActivity(
+    new Activity({
+      id: nai,
+      duration: parseInt(nad),
+      predecessors: nap,
+    })
+  );
   // console.log(newActivity.id);
   // console.log(newActivity.duration);
   // console.log(newActivity.predecessors);
@@ -517,14 +552,12 @@ addActivityBtn.addEventListener("click", function () {
 
 removeActivityBtn.addEventListener("click", function () {
   var rowsLength = table.rows.length;
-  if(rowsLength > 0){
+  if (rowsLength > 0) {
     table.deleteRow(rowsLength - 1);
     actList.removeChild(actList.lastChild);
     counter--;
+    activityList.removeLastActivity();
   }
-  // if (rowsLength >= 1) {
-  //   counter--;
-  // }
 });
 
 function sleep(milliseconds) {
@@ -536,10 +569,7 @@ function sleep(milliseconds) {
 }
 
 calculateBtn.addEventListener("click", function () {
-  if(table.rows.length > 0){
-    var result = 'hhe';
-    var info = `The result is ${result}`;
-    resultText.textContent = info;
+  if (table.rows.length > 0) {
     //resultDiv.style.display = "block";
     //styling the result div
     resultDiv.style.height = "50px";
@@ -549,16 +579,33 @@ calculateBtn.addEventListener("click", function () {
     // if(!graph.classList.contains('graph-show')){
     // }
     // document.getElementById('graph').classList.add('graph-show');
-    graph[0].classList.add('graph-show');
-    graph[0].setAttribute('id', 'cyGraph');
+    graph[0].classList.add("graph-show");
+    graph[0].setAttribute("id", "cyGraph");
     // sleep(1000);
 
     // graph.style.height = ""
     // graph.style.height = "400px";
     // graph.style.opacity = "100%";
     // graph.style.transition = "height .5s, opacity 1s";
-  
+
     algorithm();
+
+    var result = "";
+    if (
+      criticalPath === [] ||
+      criticalPath === null ||
+      criticalPath === undefined
+    ) {
+      result = "error";
+    } else {
+      for (var i = 0; i < criticalPath.length; i++) {
+        result += ` '${criticalPath[i]}'`;
+        if(i+1<criticalPath.length)
+          result+=' ->'
+      }
+    }
+    var info = `The result is ${result}`;
+    resultText.textContent = info;
   }
 });
 
@@ -590,3 +637,8 @@ calculateBtn.addEventListener("click", function () {
 //  $(document).on('click', '.allow-focus', function (e) {
 //    e.stopPropagation();
 //  });
+removeTableRows = (parent) => {
+  while (parent.childNodes.length) {
+    parent.removeChild(parent.childNodes[0]);
+  }
+};
