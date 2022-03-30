@@ -30,7 +30,13 @@ h1 span {
           box-shadow: 0 0 20px #333;
   overflow: auto;
 }
-
+.tables-result{
+  width: 100%;
+  background-color: #eee;
+  -webkit-box-shadow: 0 0 20px #333;
+          box-shadow: 0 0 20px #333;
+  overflow: auto;
+}
 .buttons {
   margin: 0;
   width: 100%;
