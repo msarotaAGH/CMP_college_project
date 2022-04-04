@@ -484,8 +484,8 @@ removeActivityBtn.addEventListener("click", function () {
   if (rowsLength > 0) {
     table.deleteRow(rowsLength - 1);
     actList.removeChild(actList.lastChild);
-    counter--;
     activityList.removeLastActivity();
+    counter--;
   }
 });
 
@@ -523,6 +523,7 @@ calculateBtn.addEventListener("click", function () {
     var info2 = `Critical path duration: ${finalDuration}`;
     resultText1.textContent = info1;
     resultText2.textContent = info2;
+    finalDuration = 0;
   }
 });
 
