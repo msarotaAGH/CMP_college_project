@@ -47,19 +47,12 @@
 
         <div class="container py-3">
             <div class="result text-center" id="resultDiv">
-                <p id="resultText"></p>
+                <p id="resultText1"></p>
+                <p id="resultText2"></p>
             </div>
         </div>
         
         <div class="container py-3">
-            <!-- <div class="graph" id="graph">
-                <div id="cyGraph">
-                    <div class="border-left"></div>
-                    <div class="border-top"></div>
-                    <div class="border-right"></div>
-                    <div class="border-bottom"></div>
-                </div>
-            </div> -->
             <div class="graph">
                 <div class="border-left"></div>
                 <div class="border-top"></div>
@@ -67,22 +60,25 @@
                 <div class="border-bottom"></div>
             </div>
         </div>
-        <div class="container tables-result">
-            <table id="resultTable" class="table">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Duration</th>
-                        <th>Early start time</th>
-                        <th>Early End time</th>
-                        <th>Late start time</th>
-                        <th>Late End time</th>
-                    </tr>
-                </thead>
-                <tbody id="resultBody">
 
-                </tbody>
-            </table>
+        <div class="container py-4">
+            <div class="tables-result">
+                <table id="resultTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>Duration</th>
+                            <th>Early start time</th>
+                            <th>Early End time</th>
+                            <th>Late start time</th>
+                            <th>Late End time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody">
+    
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="container py-4">
             <div class="about">
@@ -140,8 +136,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" id="addActivityBtn">Add</button>
-                  <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
-                  <!-- <button type="submit" class="btn btn-primary" id="addActivityBtn">Add</button> -->
                 </div>
               </div>
             </div>
@@ -162,89 +156,3 @@
     <script src="./scripts/script.js"></script>
 </body>
 </html>
-
-<!-- 
-    TO DO:
-    1. walidacja danych - komunikat o niepoprawnosci
-    >2. dropdown menu - takie działające
-    >3. sekcja about - o metodzie
-    4. logika - obliczenia na podstawie wprowadzonych danych
-    >5. estetyka
-    6. graf
-    7. dodawanie do tabeli czynnosci wybranych w dropdown
-        moze przechowywanie tych danych w jakiejs strukturze?
-        razem z wszystkimi aktywnosciami
-    8. usuwanie aktywnosci ma skutkowac usunieciem jej rowniez 
-        z dropdown menu
- -->
-
-<!-- 
-    <div class="dropdown">
-                                <button class="btn btn-default dropdown-toggle" type="button" 
-                                        id="dropdownMenu1" data-toggle="dropdown" 
-                                        aria-haspopup="true" aria-expanded="true">
-                                   <i class="glyphicon glyphicon-cog"></i>
-                                  <i class="fas fa-cog"></i>
-                                  <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu checkbox-menu allow-focus" aria-labelledby="dropdownMenu1">
-                                
-                                  <li >
-                                    <label>
-                                      <input type="checkbox"> Cheese
-                                    </label>
-                                  </li>
-                                  
-                                  <li >
-                                    <label>
-                                      <input type="checkbox"> Pepperoni
-                                    </label>
-                                  </li>
-                                  
-                                  <li >
-                                    <label>
-                                      <input type="checkbox"> Peppers
-                                    </label>
-                                  </li>
-                                  
-                                </ul>
-                              </div>
- -->
-
- <!-- 
-     <ul class="dropdown-menu">
-                                <li class="dropdown">
-                                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Dropdown Form<b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox">Two
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox">Two
-                                                </label>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-  -->
-
-  <!-- 
-      <div class="button-group">
-                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><i class="fas fa-cog"></i><span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><a href="#" class="small" data-value="option1" tabIndex="-1"><input type="checkbox"/>&nbsp;Option 1</a></li>
-                <li><a href="#" class="small" data-value="option2" tabIndex="-1"><input type="checkbox"/>&nbsp;Option 2</a></li>
-                <li><a href="#" class="small" data-value="option3" tabIndex="-1"><input type="checkbox"/>&nbsp;Option 3</a></li>
-                <li><a href="#" class="small" data-value="option4" tabIndex="-1"><input type="checkbox"/>&nbsp;Option 4</a></li>
-                <li><a href="#" class="small" data-value="option5" tabIndex="-1"><input type="checkbox"/>&nbsp;Option 5</a></li>
-                <li><a href="#" class="small" data-value="option6" tabIndex="-1"><input type="checkbox"/>&nbsp;Option 6</a></li>
-            </ul>
-          </div>
-   -->

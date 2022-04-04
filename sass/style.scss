@@ -15,6 +15,7 @@ header {
 
 h1 {
     padding: 10px;
+    padding-left: 5%;
     span {
         color: #0d6efd;
     }
@@ -58,7 +59,7 @@ h1 {
         height: 2px;
         width: 40%;
         top: 0;
-        box-shadow: 0 -2px 50px black;
+        // box-shadow: 0 -2px 50px black;
     }
     
     .border-bottom {
@@ -104,8 +105,20 @@ h1 {
     }
 }
 
-button {
-    padding: 10px;
+.tables-result {
+    position: relative;
+    height: 0px;
+    opacity: 0%;
+    background-color: #eee;
+    box-shadow: 0 0 20px #333;
+    overflow: auto;
+}
+
+.tables-result-show {
+    height: 100%;
+    max-height: 400px;
+    opacity: 100%;
+    transition: height .5s, opacity 1s;
 }
 
 footer {
@@ -128,35 +141,3 @@ footer:before {
     width: 80%;
     border-top: 2px solid #999;
 }
-
-// .checkbox-menu li label {
-//     display: block;
-//     padding: 3px 10px;
-//     clear: both;
-//     font-weight: normal;
-//     line-height: 1.42857143;
-//     color: #333;
-//     white-space: nowrap;
-//     margin:0;
-//     transition: background-color .4s ease;
-// }
-// .checkbox-menu li input {
-//     margin: 0px 5px;
-//     top: 2px;
-//     position: relative;
-// }
-
-// .checkbox-menu li.active label {
-//     background-color: #cbcbff;
-//     font-weight:bold;
-// }
-
-// .checkbox-menu li label:hover,
-// .checkbox-menu li label:focus {
-//     background-color: #f5f5f5;
-// }
-
-// .checkbox-menu li.active label:hover,
-// .checkbox-menu li.active label:focus {
-//     background-color: #b8b8ff;
-// }

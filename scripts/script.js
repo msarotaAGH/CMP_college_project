@@ -1,3 +1,5 @@
+var finalDuration = 0;
+
 function Activity(configs) {
   var self = this;
   configs = configs || {};
@@ -154,7 +156,6 @@ function ActivityList() {
         let: end.let,
         h: end.h,
       });
-
       buildCriticalPath(end, path);
     }
     return path;
@@ -208,11 +209,13 @@ var addActivityBtn = document.getElementById("addActivityBtn");
 var removeActivityBtn = document.getElementById("removeActivityBtn");
 var calculateBtn = document.getElementById("calculateBtn");
 var resultDiv = document.getElementById("resultDiv");
-var resultText = document.getElementById("resultText");
+var resultText1 = document.getElementById("resultText1");
+var resultText2 = document.getElementById("resultText2");
 var actList = document.getElementById("actList");
 var graph = document.getElementsByClassName("graph");
-
+var tablesResult = document.getElementsByClassName("tables-result");
 var table = document.getElementById("tableBody");
+
 var counter = 1;
 let criticalPath = [];
 //activity object
@@ -251,70 +254,6 @@ parseArray = (cpmList) => {
 };
 
 getData = () => {
-  //docelowo odbieranie z arraya populowanego przy dodawaniu zwyklym
-  //tymczasowo zadanie 2 CPM
-
-  // var actId = 0;
-  // var actDur = 0;
-  // var actPredecessors = [];
-
-  // for(let i in table.rows) {
-  //   let row = table.rows[i];
-  //   actId = row.cells[1];
-  //   actDur = row.cells[2];
-  //   actPredecessors
-  //   for(let j in row.cells) {
-  //     let col = row.cells[j];
-
-  //   }
-  // }
-  // var table3 = new ActivityList();
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "A",
-  //     duration: 5,
-  //   })
-  // );
-
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "B",
-  //     duration: 3,
-  //     predecessors: ["A"],
-  //   })
-  // );
-
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "C",
-  //     duration: 4,
-  //   })
-  // );
-
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "D",
-  //     duration: 6,
-  //     predecessors: ["A"],
-  //   })
-  // );
-
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "E",
-  //     duration: 4,
-  //     predecessors: ["D"],
-  //   })
-  // );
-
-  // table3.addActivity(
-  //   new Activity({
-  //     id: "F",
-  //     duration: 3,
-  //     predecessors: ["B", "C", "D"],
-  //   })
-  // );
-  // return table3;
   return activityList;
 };
 markEdges = (graphArray, path) => {
@@ -337,6 +276,7 @@ markEdges = (graphArray, path) => {
       edgeObject.target = currentObject.id;
       edgeArray.push(edgeObject);
       currentObject = predecessors[0];
+      finalDuration += currentObject.duration;
     } else break;
   }
   for (var currentEdge = 0; currentEdge < graphArray.length; currentEdge++) {
@@ -452,8 +392,6 @@ fillTable = (nodes) => {
 };
 
 addActivityBtn.addEventListener("click", function () {
-  //lokalnie nowy obiekt activity
-  //na koncu dodawany do ActivityList
 
   var row = document.createElement("tr");
   row.setAttribute("id", counter);
@@ -473,11 +411,17 @@ addActivityBtn.addEventListener("click", function () {
 
   cell[1].setAttribute("id", "actName");
   cell[1].textContent = actInput.value;
+
+  //new activity id
   var nai = actInput.value;
 
   cell[2].setAttribute("id", "actTime");
   cell[2].textContent = timeInput.value;
+
+  //new activity duration
   var nad = parseInt(timeInput.value);
+
+  //new activity predecessors
   var nap = [];
 
   if (counter == 1) {
@@ -496,14 +440,11 @@ addActivityBtn.addEventListener("click", function () {
       var precedingString = "";
       for (var i = 0; i < cbValues.length - 1; i++) {
         cell[3].textContent += cbValues[i] + ", ";
-        // newActivity.predecessors.push(cbValues[i]);
         nap.push(cbValues[i]);
-        // newActivity.predecessors[i] = cbValues[i];
       }
+
       cell[3].textContent += cbValues[cbValues.length - 1];
-      // newActivity.predecessors.push(cbValues[cbValues.length - 1]);
       nap.push(cbValues[cbValues.length - 1]);
-      // newActivity.predecessors[l]
     } else {
       cell[3].textContent = "";
     }
@@ -535,18 +476,6 @@ addActivityBtn.addEventListener("click", function () {
       predecessors: nap,
     })
   );
-  // console.log(newActivity.id);
-  // console.log(newActivity.duration);
-  // console.log(newActivity.predecessors);
-  // var al = activityList.getListAsArray();
-  // console.log(al.length);
-  // for(var i=0; i < al.length; i++) {
-  //   var act = al[i];
-  //   console.log(act.id);
-  //   console.log(act.duration);
-  //   console.log(act.predecessors);
-  //   console.log("ay");
-  // }
   counter++;
 });
 
@@ -560,33 +489,17 @@ removeActivityBtn.addEventListener("click", function () {
   }
 });
 
-function sleep(milliseconds) {
-  const date = Date.now();
-  let currentDate = null;
-  do {
-    currentDate = Date.now();
-  } while (currentDate - date < milliseconds);
-}
-
 calculateBtn.addEventListener("click", function () {
   if (table.rows.length > 0) {
-    //resultDiv.style.display = "block";
-    //styling the result div
-    resultDiv.style.height = "50px";
+
+    resultDiv.style.height = "100px";
     resultDiv.style.opacity = "100%";
     resultDiv.style.transition = "height .5s, opacity 1s";
-    //styling the graph div
-    // if(!graph.classList.contains('graph-show')){
-    // }
-    // document.getElementById('graph').classList.add('graph-show');
+
     graph[0].classList.add("graph-show");
     graph[0].setAttribute("id", "cyGraph");
-    // sleep(1000);
-
-    // graph.style.height = ""
-    // graph.style.height = "400px";
-    // graph.style.opacity = "100%";
-    // graph.style.transition = "height .5s, opacity 1s";
+  
+    tablesResult[0].classList.add("tables-result-show");
 
     algorithm();
 
@@ -604,39 +517,15 @@ calculateBtn.addEventListener("click", function () {
           result+=' ->'
       }
     }
-    var info = `The result is ${result}`;
-    resultText.textContent = info;
+    console.log(finalDuration);
+
+    var info1 = `Critical path: ${result}`;
+    var info2 = `Critical path duration: ${finalDuration}`;
+    resultText1.textContent = info1;
+    resultText2.textContent = info2;
   }
 });
 
-//data validation
-// (function () {
-//     'use strict'
-//     var forms = document.querySelectorAll('.needs-validation');
-
-//     Array.prototype.slice.call(forms).forEach(function (form){
-//         form.addEventListener('submit', function (event) {
-//             if(!form.checkValidity()) {
-//                 event.preventDefault();
-//                 event.stopPropagation();
-//                 console.log("aaaaaa");
-//             }
-//             form.classList.add('was-validated');
-//         }, false)
-//     })
-// })
-
-// dodac sprawdzenie czy tabela nie jest pusta
-// bo jesli jest pusta a zostanie wcisniety
-// to sie zmniejszy licznik
-
-// $(".checkbox-menu").on("change", "input[type='checkbox']", function() {
-//     $(this).closest("li").toggleClass("active", this.checked);
-//  });
-
-//  $(document).on('click', '.allow-focus', function (e) {
-//    e.stopPropagation();
-//  });
 removeTableRows = (parent) => {
   while (parent.childNodes.length) {
     parent.removeChild(parent.childNodes[0]);

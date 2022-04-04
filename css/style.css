@@ -16,6 +16,7 @@ header {
 
 h1 {
   padding: 10px;
+  padding-left: 5%;
 }
 
 h1 span {
@@ -30,13 +31,7 @@ h1 span {
           box-shadow: 0 0 20px #333;
   overflow: auto;
 }
-.tables-result{
-  width: 100%;
-  background-color: #eee;
-  -webkit-box-shadow: 0 0 20px #333;
-          box-shadow: 0 0 20px #333;
-  overflow: auto;
-}
+
 .buttons {
   margin: 0;
   width: 100%;
@@ -69,8 +64,6 @@ h1 span {
   height: 2px;
   width: 40%;
   top: 0;
-  -webkit-box-shadow: 0 -2px 50px black;
-          box-shadow: 0 -2px 50px black;
 }
 
 .graph .border-bottom {
@@ -114,8 +107,22 @@ h1 span {
   width: 200px;
 }
 
-button {
-  padding: 10px;
+.tables-result {
+  position: relative;
+  height: 0px;
+  opacity: 0%;
+  background-color: #eee;
+  -webkit-box-shadow: 0 0 20px #333;
+          box-shadow: 0 0 20px #333;
+  overflow: auto;
+}
+
+.tables-result-show {
+  height: 100%;
+  max-height: 400px;
+  opacity: 100%;
+  -webkit-transition: height .5s, opacity 1s;
+  transition: height .5s, opacity 1s;
 }
 
 footer {
