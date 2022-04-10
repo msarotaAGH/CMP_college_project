@@ -1,46 +1,60 @@
 var finalDuration = 0;
 
 function Activity(configs) {
-  var self = this;
   configs = configs || {};
-  self.id = configs.id;
-  self.duration = configs.duration;
-  self.est = configs.est; //Earliest Start Time
-  self.lst = configs.lst; //Latest Start Time
-  self.eet = configs.eet; //Earliest End Time
-  self.let = configs.let; //Latest End Time
-  self.h = configs.h; //clearance (holgura)
-  self.successors = [];
-  self.predecessors = configs.predecessors || [];
-  return self;
+  this.id = configs.id;
+
+  //czas trwania
+  this.duration = configs.duration;
+
+  //wczesny start (early end time)
+  this.est = configs.est;
+
+  //pozny start (late end time)
+  this.lst = configs.lst;
+
+  //wczesny koniec (early end time)
+  this.eet = configs.eet;
+
+  //pozny koniec (late end time)
+  this.let = configs.let;
+  //luz
+  this.clearance = configs.clearance;
+
+  //nastepnicy
+  this.successors = [];
+
+  //poprzednicy
+  this.predecessors = configs.predecessors || [];
+
+  return this;
 }
 
+//klasa zawierajaca liste elementow oraz metody
 function ActivityList() {
-  var self = this;
-  var processed = false;
-  var list = {};
-  var start, end;
+  let list = {};
+  let start, end;
+  let processed = false;
 
-  self.addActivity = function (activity) {
+  //dodawanie czynnosci
+  this.addActivity = function (activity) {
     list[activity.id] = activity;
   };
-  self.removeLastActivity = function () {
-    var objects = Object.keys(list)
-    var key=objects[objects.length-1]
-    delete list[key]
+
+  //sprawdzanie, czy lista zawiera czynnosc
+  this.doesListContain = function (key) {
+    if (key in list) return true;
+    else return false;
   };
-  self.doesListContain = function(key){
-    if (key in list)
-      return true
-    else
-      return false
-  }
+
+  //procesowanie listy
   function processList() {
     if (processed) {
       return;
     }
     processed = true;
 
+    //dodawanie startowej czynnosci pozornej
     start = new Activity({ id: "start", duration: 0 });
 
     //Replaces id for pointers to actvities
@@ -66,29 +80,38 @@ function ActivityList() {
     }
   }
 
+  //ustawienie wczesnych czasow rozpoczecia i zakonczenia
   function setEarlyTimes(root) {
+    //metoda przechodzi po wszystkich nastepnikach
     for (var i in root.successors) {
       var node = root.successors[i];
 
       var predesessors = node.predecessors;
+      //metoda przechodzi po wszystkich poprzednikach
       for (var j in predesessors) {
         var activity = predesessors[j];
+        //i ustawia odpowiednie czasy zakonczenia i rozpoczecia
         if (node.est == null || node.est < activity.eet)
           node.est = activity.eet;
       }
       node.eet = node.est + node.duration;
+      //rekurencyjnie ustawia nastepnym odpowiednie czasy
       setEarlyTimes(node);
     }
   }
 
+  //ustawienie poznych czasow rozpoczecia i zakonczenia
   function setLateTimes(root) {
+    //jesli nie ma nastepnikow, to od razu obliczamy czasy i roznice
     if (root.successors.length == 0) {
       root.let = root.eet;
       root.lst = root.let - root.duration;
-      root.h = root.eet - root.let;
+      root.clearance = root.eet - root.let;
     } else {
+      //metoda przechodzi po wszystkich nastepnikach
       for (var i in root.successors) {
         var node = root.successors[i];
+        //rekurencyjnie ustawia nastepnym odpowiednie czasy
         setLateTimes(node);
         if (root.let == null || root.let > node.lst) {
           root.let = node.lst;
@@ -96,16 +119,18 @@ function ActivityList() {
       }
 
       root.lst = root.let - root.duration;
-      root.h = root.let - root.eet;
+      root.clearance = root.let - root.eet;
     }
   }
 
+  //zbudowanie sciezki krytycznej
   function buildCriticalPath(root, path) {
-    if (root.h == 0) {
+    //metoda przechodzi po wszystkich node'ach, ktore maja luz rowny 0 i kopiuje taka sciezke do nowej listy
+    if (root.clearance == 0) {
       var predecessors = root.predecessors;
       for (var i in predecessors) {
         var node = predecessors[i];
-        if (node.h == 0) {
+        if (node.clearance == 0) {
           var clone = new Activity({
             id: node.id,
             duration: node.duration,
@@ -113,7 +138,7 @@ function ActivityList() {
             lst: node.lst,
             eet: node.eet,
             let: node.let,
-            h: node.h,
+            clearance: node.clearance,
           });
           if (node !== start) {
             path.predecessors.push(clone);
@@ -124,7 +149,8 @@ function ActivityList() {
     }
   }
 
-  self.getCriticalPath = function (endid) {
+  //glowna metoda laczaca poprzednie, wywolywana na ostatnim elemencie
+  this.getCriticalPath = function (endid) {
     if (!endid) {
       throw new Error("End activity id is required!");
     }
@@ -134,19 +160,20 @@ function ActivityList() {
     }
     processList();
 
+    //ustawienie wczesnych czasow
     start.est = 0;
     start.eet = 0;
     setEarlyTimes(start);
 
-    //Setup End Times
+    //ustawienie poznych czasow
     end.let = end.eet;
     end.lst = end.let - end.duration;
-    end.h = end.eet - end.let;
+    end.clearance = end.eet - end.let;
     setLateTimes(start);
 
-    //Assemble Critical Path (tree)
+    //zbudowanie sciezki rekurencyjnie
     var path = null;
-    if (end.h == 0) {
+    if (end.clearance == 0) {
       var path = new Activity({
         id: end.id,
         duration: end.duration,
@@ -154,23 +181,25 @@ function ActivityList() {
         lst: end.lst,
         eet: end.eet,
         let: end.let,
-        h: end.h,
+        clearance: end.clearance,
       });
       buildCriticalPath(end, path);
     }
     return path;
   };
 
-  self.getList = function () {
+  //zwracanie listy
+  this.getList = function () {
     processList();
     return list;
   };
 
-  self.getListAsArray = () => {
+  //zwracanie listy jako tablica
+  this.getListAsArray = () => {
     processList();
     return Object.values(list);
   };
-  return self;
+  return this;
 }
 
 $(document).ready(function () {
@@ -219,9 +248,11 @@ var table = document.getElementById("tableBody");
 var counter = 1;
 let criticalPath = [];
 
-parseArray = (cpmList) => {
+//metoda do wybierania odpowiednich rzeczy z listy
+function parseArray(cpmList) {
   console.log("TABLE 3", cpmList);
   var returnArray = [];
+  //przechodzenie po calej liscie i tworzenie tablicy node'ow i krawdzi do diagramu
   for (var listElement = 0; listElement < cpmList.length; listElement++) {
     var nodeObject = new Object();
     var data = new Object();
@@ -237,7 +268,7 @@ parseArray = (cpmList) => {
     returnArray.push(nodeObject);
 
     for (var iter = 0; iter < successors.length; iter++) {
-      if (activityList.doesListContain(successors[iter].id)){
+      if (activityList.doesListContain(successors[iter].id)) {
         var edgeObject = new Object();
         var data = new Object();
         edgeObject.data = data;
@@ -250,28 +281,31 @@ parseArray = (cpmList) => {
     }
   }
   return returnArray;
-};
-getData = () => {
-  var activityTable=document.getElementById("tableBody")
-  for(var i=0;i<activityTable.rows.length;i++){
-    var pred=activityTable.rows[i].getAttribute("data-pred")
-    if(pred!==null && pred!==undefined)
-      pred=activityTable.rows[i].getAttribute("data-pred").split('|')
-    else
-      pred=[]
+}
 
-    pred=arrayRemove(pred,"")
+//pobieranie danych do algorytmu bezposrednio z tabelki widocznej dla usera
+function getData() {
+  var activityTable = document.getElementById("tableBody");
+  for (var i = 0; i < activityTable.rows.length; i++) {
+    var predecessors = activityTable.rows[i].getAttribute("data-pred");
+    if (predecessors !== null && predecessors !== undefined)
+      predecessors = activityTable.rows[i].getAttribute("data-pred").split("|");
+    else predecessors = [];
+
+    predecessors = arrayRemove(predecessors, "");
     activityList.addActivity(
       new Activity({
         id: activityTable.rows[i].getAttribute("data-actname"),
         duration: parseInt(activityTable.rows[i].getAttribute("data-acttime")),
-        predecessors: pred,
+        predecessors,
       })
     );
   }
   return activityList;
-};
-markEdges = (graphArray, path) => {
+}
+
+//zaznaczanie krawedzi i node'ow na odpowiednie kolory (po wykonaniu algorytmu)
+function markEdges(graphArray, path) {
   if (path === null) return null;
   var currentObject = path;
   var edgeArray = [];
@@ -313,8 +347,10 @@ markEdges = (graphArray, path) => {
   }
 
   return graphArray;
-};
-parsePath = (path) => {
+}
+
+//wybranie ze zwroconej sciezki krytycznej odpowiednich rzeczy
+function parsePath(path) {
   if (path === null) return null;
   var returnArray = [];
   var currentObject = path;
@@ -329,8 +365,10 @@ parsePath = (path) => {
     else currentObject = currentObject.predecessors[0];
   }
   return returnArray;
-};
-displayGraph = (data) => {
+}
+
+//konfiguracja grafu
+function displayGraph(data) {
   var cy = cytoscape({
     container: document.getElementById("cyGraph"),
     elements: data,
@@ -366,20 +404,29 @@ displayGraph = (data) => {
   cy.ready(function () {
     cy.fit();
   });
-};
+}
 
-algorithm = () => {
+function algorithm() {
+  //pobieranie danych
   var data = getData();
+  //pobranie danych do tablicy node'ow i krawedzi
   var graphArray = parseArray(data.getListAsArray());
+  //obliczenie sciezki
   var path = data.getCriticalPath(graphArray[graphArray.length - 1].data.id);
+  //zazmaczenie krawedzi
   graphArray = markEdges(graphArray, path);
   criticalPath = parsePath(path);
   console.log(path);
+  //wyswietlenie grafu
   displayGraph(graphArray);
+  //wypelnienie tabelki z wynikami
   fillTable(data.getListAsArray());
+  //wyczyszczenie listy po obliczeniu wszystkiego
   activityList = new ActivityList();
-};
-fillTable = (nodes) => {
+}
+
+//wypelnienie tabelki z wynikami
+function fillTable(nodes) {
   var table = document.getElementById("resultBody");
   removeTableRows(table);
   for (var i = 0; i < nodes.length; i++) {
@@ -406,10 +453,20 @@ fillTable = (nodes) => {
 
     table.appendChild(tr);
   }
-};
+}
 
+function removeTableRows(parent) {
+  while (parent.childNodes.length) {
+    parent.removeChild(parent.childNodes[0]);
+  }
+}
+
+function arrayRemove(arr, value) {
+  return arr.filter(function (ele) {
+    return ele != value;
+  });
+}
 addActivityBtn.addEventListener("click", function () {
-
   var row = document.createElement("tr");
   row.setAttribute("id", counter);
 
@@ -424,18 +481,18 @@ addActivityBtn.addEventListener("click", function () {
   var timeInput = document.getElementById("inputTime");
 
   cell[0].classList.add("actNum");
-  row.setAttribute("data-num",counter)
+  row.setAttribute("data-num", counter);
   cell[0].textContent = counter;
 
   cell[1].classList.add("actName");
-  row.setAttribute("data-actName",actInput.value);
+  row.setAttribute("data-actName", actInput.value);
   cell[1].textContent = actInput.value;
 
   //new activity id
   var nai = actInput.value;
 
   cell[2].classList.add("actTime");
-  row.setAttribute("data-actTime",timeInput.value);
+  row.setAttribute("data-actTime", timeInput.value);
   cell[2].textContent = timeInput.value;
 
   //new activity duration
@@ -462,16 +519,16 @@ addActivityBtn.addEventListener("click", function () {
 
       for (var i = 0; i <= cbValues.length - 1; i++) {
         cell[3].textContent += cbValues[i] + ", ";
-        data_predecessors+=cbValues[i]+"|";
+        data_predecessors += cbValues[i] + "|";
         nap.push(cbValues[i]);
       }
 
-      row.setAttribute("data-pred",data_predecessors);
+      row.setAttribute("data-pred", data_predecessors);
       //cell[3].textContent += cbValues[cbValues.length - 1];
       //nap.push(cbValues[cbValues.length - 1]);
     } else {
       cell[3].textContent = "";
-      row.setAttribute("data-pred","");
+      row.setAttribute("data-pred", "");
     }
   }
 
@@ -494,7 +551,7 @@ addActivityBtn.addEventListener("click", function () {
   table.appendChild(row);
 
   //dodanie utworzonego tutaj obiektu Activity do globalnej ActivityList
-  
+
   counter++;
 });
 
@@ -503,6 +560,7 @@ removeActivityBtn.addEventListener("click", function () {
   if (rowsLength > 0) {
     table.deleteRow(rowsLength - 1);
     actList.removeChild(actList.lastChild);
+    activityList = new ActivityList();
     counter--;
   }
 });
@@ -515,7 +573,7 @@ calculateBtn.addEventListener("click", function () {
 
     graph[0].classList.add("graph-show");
     graph[0].setAttribute("id", "cyGraph");
-  
+
     tablesResult[0].classList.add("tables-result-show");
 
     algorithm();
@@ -530,8 +588,7 @@ calculateBtn.addEventListener("click", function () {
     } else {
       for (var i = 0; i < criticalPath.length; i++) {
         result += ` '${criticalPath[i]}'`;
-        if(i+1<criticalPath.length)
-          result+=' ->'
+        if (i + 1 < criticalPath.length) result += " ->";
       }
     }
 
@@ -542,15 +599,3 @@ calculateBtn.addEventListener("click", function () {
     finalDuration = 0;
   }
 });
-
-removeTableRows = (parent) => {
-  while (parent.childNodes.length) {
-    parent.removeChild(parent.childNodes[0]);
-  }
-};
-
-arrayRemove = (arr, value) => {  
-  return arr.filter(function(ele){ 
-      return ele != value; 
-  });
-}
