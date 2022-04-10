@@ -218,7 +218,6 @@ var table = document.getElementById("tableBody");
 
 var counter = 1;
 let criticalPath = [];
-//activity object
 
 parseArray = (cpmList) => {
   console.log("TABLE 3", cpmList);
@@ -252,8 +251,24 @@ parseArray = (cpmList) => {
   }
   return returnArray;
 };
-
 getData = () => {
+  var activityTable=document.getElementById("tableBody")
+  for(var i=0;i<activityTable.rows.length;i++){
+    var pred=activityTable.rows[i].getAttribute("data-pred")
+    if(pred!==null && pred!==undefined)
+      pred=activityTable.rows[i].getAttribute("data-pred").split('|')
+    else
+      pred=[]
+
+    pred=arrayRemove(pred,"")
+    activityList.addActivity(
+      new Activity({
+        id: activityTable.rows[i].getAttribute("data-actname"),
+        duration: parseInt(activityTable.rows[i].getAttribute("data-acttime")),
+        predecessors: pred,
+      })
+    );
+  }
   return activityList;
 };
 markEdges = (graphArray, path) => {
@@ -356,13 +371,13 @@ displayGraph = (data) => {
 algorithm = () => {
   var data = getData();
   var graphArray = parseArray(data.getListAsArray());
-  console.log(graphArray);
   var path = data.getCriticalPath(graphArray[graphArray.length - 1].data.id);
   graphArray = markEdges(graphArray, path);
   criticalPath = parsePath(path);
   console.log(path);
   displayGraph(graphArray);
   fillTable(data.getListAsArray());
+  activityList = new ActivityList();
 };
 fillTable = (nodes) => {
   var table = document.getElementById("resultBody");
@@ -381,12 +396,14 @@ fillTable = (nodes) => {
     lst.innerText = nodes[i].lst;
     var LeT = document.createElement("td");
     LeT.innerText = nodes[i].let;
+
     tr.appendChild(id);
     tr.appendChild(duration);
     tr.appendChild(est);
     tr.appendChild(eet);
     tr.appendChild(lst);
     tr.appendChild(LeT);
+
     table.appendChild(tr);
   }
 };
@@ -406,16 +423,19 @@ addActivityBtn.addEventListener("click", function () {
   var actInput = document.getElementById("inputActivity");
   var timeInput = document.getElementById("inputTime");
 
-  cell[0].setAttribute("id", "actNum");
+  cell[0].classList.add("actNum");
+  row.setAttribute("data-num",counter)
   cell[0].textContent = counter;
 
-  cell[1].setAttribute("id", "actName");
+  cell[1].classList.add("actName");
+  row.setAttribute("data-actName",actInput.value);
   cell[1].textContent = actInput.value;
 
   //new activity id
   var nai = actInput.value;
 
-  cell[2].setAttribute("id", "actTime");
+  cell[2].classList.add("actTime");
+  row.setAttribute("data-actTime",timeInput.value);
   cell[2].textContent = timeInput.value;
 
   //new activity duration
@@ -424,8 +444,9 @@ addActivityBtn.addEventListener("click", function () {
   //new activity predecessors
   var nap = [];
 
+  cell[3].classList.add("actPreceding");
+
   if (counter == 1) {
-    cell[3].setAttribute("id", "actPreceding");
     cell[3].textContent = "";
   } else {
     var checkboxes = document.querySelectorAll(
@@ -437,16 +458,20 @@ addActivityBtn.addEventListener("click", function () {
         cbValues.push(checkbox.value.toString());
       });
 
-      var precedingString = "";
-      for (var i = 0; i < cbValues.length - 1; i++) {
+      var data_predecessors = "";
+
+      for (var i = 0; i <= cbValues.length - 1; i++) {
         cell[3].textContent += cbValues[i] + ", ";
+        data_predecessors+=cbValues[i]+"|";
         nap.push(cbValues[i]);
       }
 
-      cell[3].textContent += cbValues[cbValues.length - 1];
-      nap.push(cbValues[cbValues.length - 1]);
+      row.setAttribute("data-pred",data_predecessors);
+      //cell[3].textContent += cbValues[cbValues.length - 1];
+      //nap.push(cbValues[cbValues.length - 1]);
     } else {
       cell[3].textContent = "";
+      row.setAttribute("data-pred","");
     }
   }
 
@@ -469,13 +494,7 @@ addActivityBtn.addEventListener("click", function () {
   table.appendChild(row);
 
   //dodanie utworzonego tutaj obiektu Activity do globalnej ActivityList
-  activityList.addActivity(
-    new Activity({
-      id: nai,
-      duration: parseInt(nad),
-      predecessors: nap,
-    })
-  );
+  
   counter++;
 });
 
@@ -484,14 +503,12 @@ removeActivityBtn.addEventListener("click", function () {
   if (rowsLength > 0) {
     table.deleteRow(rowsLength - 1);
     actList.removeChild(actList.lastChild);
-    activityList.removeLastActivity();
     counter--;
   }
 });
 
 calculateBtn.addEventListener("click", function () {
   if (table.rows.length > 0) {
-
     resultDiv.style.height = "100px";
     resultDiv.style.opacity = "100%";
     resultDiv.style.transition = "height .5s, opacity 1s";
@@ -517,7 +534,6 @@ calculateBtn.addEventListener("click", function () {
           result+=' ->'
       }
     }
-    console.log(finalDuration);
 
     var info1 = `Critical path: ${result}`;
     var info2 = `Critical path duration: ${finalDuration}`;
@@ -532,3 +548,9 @@ removeTableRows = (parent) => {
     parent.removeChild(parent.childNodes[0]);
   }
 };
+
+arrayRemove = (arr, value) => {  
+  return arr.filter(function(ele){ 
+      return ele != value; 
+  });
+}
