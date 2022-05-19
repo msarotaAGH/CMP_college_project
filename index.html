@@ -15,131 +15,198 @@
 <body>
 
     <header>
-        <h1> <span>C</span>ritical <span>P</span>ath <span>M</span>ethod Calculator</h1>
+        <h1><span>C</span>ritical <span>P</span>ath <span>M</span>ethod Calculator and <span>T</span>ransportation <span>P</span>roblem Solver</h1>
     </header>
 
     <main class="mb-3">
-
-        <div class="container pt-5 pb-3">
-            <div class="tables">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Activity</th>
-                            <th scope="col">Time requirement</th>
-                            <th scope="col">Predecessors</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                    </tbody>
-                </table>
+        <div class="cpm">
+            <div class="container pt-5 pb-3">
+                <h1 class="tableHeader">Critical Path Method Calculator</h1>
+                <div class="tables">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Activity</th>
+                                <th scope="col">Time requirement</th>
+                                <th scope="col">Predecessors</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        
-        <div class="container py-3">
-            <div class="buttons row">
-                <button type="button" id="newActivityBtn" class="btn btn-primary col one" data-bs-toggle="modal" data-bs-target="#newActivityModal">New activity</button>
-                <button type="button" id="removeActivityBtn" class="btn btn-secondary col two">Remove activity</button>
-                <button type="button" id="calculateBtn" class="btn btn-outline-primary col three">Calculate</button>
+            
+            <div class="container py-3">
+                <div class="buttons row">
+                    <button type="button" id="newActivityBtn" class="btn btn-primary col one" data-bs-toggle="modal" data-bs-target="#newActivityModal">New activity</button>
+                    <button type="button" id="removeActivityBtn" class="btn btn-secondary col two">Remove activity</button>
+                    <button type="button" id="calculateBtn" class="btn btn-outline-primary col three">Calculate</button>
+                </div>
             </div>
-        </div>
-
-        <div class="container py-3">
-            <div class="result text-center" id="resultDiv">
-                <p id="resultText1"></p>
-                <p id="resultText2"></p>
-            </div>
-        </div>
-        
-        <div class="container py-3">
-            <div class="graph">
-                <div class="border-left"></div>
-                <div class="border-top"></div>
-                <div class="border-right"></div>
-                <div class="border-bottom"></div>
-            </div>
-        </div>
-
-        <div class="container py-4">
-            <div class="tables-result">
-                <table id="resultTable" class="table">
-                    <thead>
-                        <tr>
-                            <th>Activity</th>
-                            <th>Duration</th>
-                            <th>Early start time</th>
-                            <th>Early End time</th>
-                            <th>Late start time</th>
-                            <th>Late End time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultBody">
     
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="container py-4">
-            <div class="about">
-                <h2>About</h2>
-                <div class="underline mb-4"></div>
-                <p>The critical path method (CPM), or critical path analysis (CPA), is an algorithm for scheduling a set of project activities. It is commonly used in conjunction with the program evaluation and review technique (PERT). A critical path is determined by identifying the longest stretch of dependent activities and measuring the time required to complete them from start to finish.</p>
-            </div>
-        </div>
-
-        <div class="modal fade" id="newActivityModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">New activity</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="container py-3">
+                <div class="result text-center" id="resultDiv">
+                    <p id="resultText1"></p>
+                    <p id="resultText2"></p>
                 </div>
-                <div class="modal-body">
-                    <form class="row needs-validation">
-                        <div class="col-md-4">
-                            <label for="inputActivity" class="form-label">Activity</label>
-                            <input type="text" class="form-control" id="inputActivity" maxlength="40">
-                            <div class="invalid-feedback">
-                                Please provide activity name.
+            </div>
+            
+            <div class="container py-3">
+                <div class="graph">
+                    <div class="border-left"></div>
+                    <div class="border-top"></div>
+                    <div class="border-right"></div>
+                    <div class="border-bottom"></div>
+                </div>
+            </div>
+    
+            <div class="container py-4">
+                <div class="tables-result">
+                    <table id="resultTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Duration</th>
+                                <th>Early start time</th>
+                                <th>Early End time</th>
+                                <th>Late start time</th>
+                                <th>Late End time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultBody">
+        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="container py-4">
+                <div class="about">
+                    <h2>About</h2>
+                    <div class="underline mb-4"></div>
+                    <p>The critical path method (CPM), or critical path analysis (CPA), is an algorithm for scheduling a set of project activities. It is commonly used in conjunction with the program evaluation and review technique (PERT). A critical path is determined by identifying the longest stretch of dependent activities and measuring the time required to complete them from start to finish.</p>
+                </div>
+            </div>
+    
+            <div class="modal fade" id="newActivityModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">New activity</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="row needs-validation">
+                            <div class="col-md-4">
+                                <label for="inputActivity" class="form-label">Activity</label>
+                                <input type="text" class="form-control" id="inputActivity" maxlength="40">
+                                <div class="invalid-feedback">
+                                    Please provide activity name.
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="inputTime" class="form-label">Time requirement</label>
-                            <input type="number" class="form-control" id="inputTime" min="0" required>
-                            <div class="invalid-feedback">
-                                Please provide time requirement.
+                            <div class="col-md-4">
+                                <label for="inputTime" class="form-label">Time requirement</label>
+                                <input type="number" class="form-control" id="inputTime" min="0" required>
+                                <div class="invalid-feedback">
+                                    Please provide time requirement.
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-
-
-                            <label class="form-label">Preceding activity</label>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                  Select activities...
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="actList">
-                                  <!-- <li >
-                                    <label>
-                                      &nbsp;<input type="checkbox"> &nbsp;Cheese
-                                    </label>
-                                  </li> -->
-                                  <!-- <li><a class="dropdown-item" href="#">Action</a></li> -->
-                                </ul>
-                              </div>
-                                     
                             
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" id="addActivityBtn">Add</button>
+                            <div class="col-md-4">
+    
+    
+                                <label class="form-label">Preceding activity</label>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                      Select activities...
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="actList">
+                                      <!-- <li >
+                                        <label>
+                                          &nbsp;<input type="checkbox"> &nbsp;Cheese
+                                        </label>
+                                      </li> -->
+                                      <!-- <li><a class="dropdown-item" href="#">Action</a></li> -->
+                                    </ul>
+                                  </div>
+                                         
+                                
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="addActivityBtn">Add</button>
+                    </div>
+                  </div>
                 </div>
               </div>
+        </div>
+        <div class="tp">
+            <!--table-->
+            <div class="container pt-5 pb-3">
+                <h1 class="tableHeader">Transportation Problem Solver</h1>
+                <div class="tables2">
+                    <div class="textTop">
+                        <span>Recipents</span>
+                    </div>
+                    <div id="bottomHelper">
+                        <div class="textLeft">
+                            <span>Suppliers</span>
+                        </div>
+                        <table class="table tableInline" contenteditable="true" id="transportTable">
+                        </table>
+                    </div>
+                </div>
             </div>
-          </div>
+            <!--buttons-->
+            <div class="container py-3">
+                <div class="buttons row">
+                    <button type="button" id="newTransportation" class="btn btn-primary col one" data-bs-toggle="modal" data-bs-target="#transportationModal">New transportation values</button>
+                    <button type="button" id="resetTransportation" class="btn btn-secondary col two">Reset values</button>
+                    <button type="button" id="calculateTransportationButton" class="btn btn-outline-primary col three">Calculate</button>
+                </div>
+            </div>
+            <div class="container py-4">
+                <div class="about">
+                    <h2>About</h2>
+                    <div class="underline mb-4"></div>
+                    <p>The transportation problem is a type of linear programming problem designed to minimize the cost of distributing a product from M sources to N destinations. The transportation problem can be described using examples from many fields.</p>
+                </div>
+            </div>
+            <!--modal-->
+            <div class="modal fade" id="transportationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Transportation values</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="row needs-validation">
+                            <div class="col-md-6">
+                                <label for="inputRecipientNumber" class="form-label">Recipents</label>
+                                <input type="number" class="form-control" id="inputRecipientNumber" min="1" max="7" required>
+                                <div class="invalid-feedback">
+                                    Please provide amount of recipents
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="inputSuppliersNumber" class="form-label">Suppliers</label>
+                                <input type="number" class="form-control" id="inputSuppliersNumber" min="1" max="7" required>
+                                <div class="invalid-feedback">
+                                    Please provide amount of suppliers
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="addTransportationBtn">Submit</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
     </main>
     <footer class="pt-3">
         <p class="mb-0">&copy; jkms 2022</p>

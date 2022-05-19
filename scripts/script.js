@@ -245,6 +245,10 @@ var graph = document.getElementsByClassName("graph");
 var tablesResult = document.getElementsByClassName("tables-result");
 var table = document.getElementById("tableBody");
 
+var addTransportationBtn=document.getElementById("addTransportationBtn");
+var resetTransportationButton=document.getElementById("resetTransportation");
+var calculateTransportationButton=document.getElementById("calculateTransportationButton");
+
 var counter = 1;
 let criticalPath = [];
 
@@ -466,6 +470,42 @@ function arrayRemove(arr, value) {
     return ele != value;
   });
 }
+
+function fillTransportationTable(rows, cols){
+  console.log(rows,cols)
+  var transportTable=document.getElementById("transportTable")
+  for(var i=0;i<rows+1;i++){
+    var row=document.createElement("tr");
+    if(i==0)
+      row.classList.add("headFields")
+    for(j=0;j<cols+1;j++){
+      var col=document.createElement("td");
+      if(i==0||j==0)
+        col.classList.add("headFields")
+      if(i==0&&j!=0)
+        col.textContent="R"+j;
+      if(i!=0&&j==0)
+        col.textContent="S"+i;
+      if(i==0&&j==0){
+        col.textContent="/"
+        col.contentEditable=false
+      }
+      col.id="R"+j+";"+"S"+i;
+      col.setAttribute("data-r",j)
+      col.setAttribute("data-s",i)
+      row.appendChild(col);
+    }
+    transportTable.appendChild(row)
+  }
+}
+
+function cleanTransportationTable(){
+  var transportTable=document.getElementById("transportTable")
+  while (transportTable.hasChildNodes()) {  
+    transportTable.removeChild(transportTable.firstChild);
+  }
+}
+
 addActivityBtn.addEventListener("click", function () {
   var row = document.createElement("tr");
   row.setAttribute("id", counter);
@@ -598,4 +638,27 @@ calculateBtn.addEventListener("click", function () {
     resultText2.textContent = info2;
     finalDuration = 0;
   }
+});
+addTransportationBtn.addEventListener("click", function(){
+  cleanTransportationTable()
+  var recipentsField=document.getElementById("inputRecipientNumber");
+  var suppliersField=document.getElementById("inputSuppliersNumber");
+  var transportationModal=document.getElementById("transportationModal");
+  transportationModal=bootstrap.Modal.getInstance(transportationModal)
+  //TODO: ADD A TOAST MSG WITH ERROR
+  if(recipentsField.value!==null&&recipentsField.value!=="" && suppliersField.value!==null&&suppliersField.value!==""){
+    var recipents=Number(recipentsField.value);
+    var suppliers=Number(suppliersField.value);
+    transportationModal.hide();
+    fillTransportationTable(suppliers,recipents)
+  }
+  else{
+    console.log("error")
+  }
+});
+resetTransportationButton.addEventListener("click", function(){
+  cleanTransportationTable();
+});
+calculateTransportationButton.addEventListener("click", function(){
+  alert("calculate")
 });
