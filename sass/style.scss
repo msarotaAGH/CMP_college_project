@@ -20,6 +20,9 @@ h1 {
         color: #0d6efd;
     }
 }
+.tableHeader{
+    padding-left: 0;
+}
 
 .tables {
     width: 100%;
@@ -29,6 +32,71 @@ h1 {
     overflow: auto;
 }
 
+.tables2 {
+    width: 100%;
+    height: 475px;
+    background-color: #eee;
+    box-shadow: 0 0 20px #333;
+    overflow: auto;
+}
+.textTop{
+    display: flex;
+    text-align: left;
+    width: 100%;
+    font-weight: bold;
+    text-align: center;
+    height: 50px;
+    justify-content: center;
+    span{
+        display: inline-block;
+        align-self: flex-end;
+        text-align: center;
+        letter-spacing: 1em;
+    }
+}
+.textLeft{
+    width: 50px;
+    padding: 5px;
+    height: 350px;
+    display: inline-block;
+    span{
+        height: 100%;
+        width: 100%;
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        text-align: center;
+        font-weight: bold;
+        letter-spacing: 0.3em;
+    }
+}
+.tableInline{
+    width: 94%;
+    height: 350px;
+    display: inline-block;
+}
+.bottomHelper{
+    width: 100%;
+    height: 400px;
+}
+
+.headFields{
+    font-weight: bold;
+    border: 0px;
+}
+#transportTable{
+    border-collapse:collapse;
+    td{
+        min-width: 150px;
+        height: 50px;
+        text-align: center;
+    }
+    tr:hover{
+        background-color: #ddd
+    }
+    tr > :not(:first-child){
+        border-left: 2px solid rgb(33, 37, 41);
+    }
+}
 .buttons {
     margin: 0;
     width: 100%;
