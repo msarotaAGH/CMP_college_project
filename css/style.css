@@ -76,10 +76,12 @@ h1 span {
   letter-spacing: 0.3em;
 }
 
-.tableInline {
+.tableRight {
+  display: inline-block;
   width: 94%;
   height: 350px;
-  display: inline-block;
+  justify-content: center;
+  align-items: center;
 }
 
 .bottomHelper {
