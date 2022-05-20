@@ -649,8 +649,10 @@ addTransportationBtn.addEventListener("click", function(){
   if(recipentsField.value!==null&&recipentsField.value!=="" && suppliersField.value!==null&&suppliersField.value!==""){
     var recipents=Number(recipentsField.value);
     var suppliers=Number(suppliersField.value);
-    transportationModal.hide();
-    fillTransportationTable(suppliers,recipents)
+    if(recipents<=7&&recipents>1 &&suppliers<=7&&suppliers>1){
+      transportationModal.hide();
+      fillTransportationTable(suppliers,recipents)
+    }
   }
   else{
     console.log("error")
