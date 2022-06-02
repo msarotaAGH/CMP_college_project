@@ -176,12 +176,12 @@
                     <p>The transportation problem is a type of linear programming problem designed to minimize the cost of distributing a product from M sources to N destinations. The transportation problem can be described using examples from many fields.</p>
                 </div>
             </div>
-            <!--modal-->
-            <div class="modal fade" id="transportationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <!--modal for table-->
+            <div class="modal fade" id="transportationModal" tabindex="-1" aria-labelledby="transportModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel">Transportation values</h5>
+                      <h5 class="modal-title" id="transportModalLabel">Transportation values</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -204,6 +204,70 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="addTransportationBtn">Submit</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <!--modal for supply-->
+            <div class="modal fade" id="supplierModal" tabindex="-1" aria-labelledby="supplyModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="supplyModalLabel">Supply values</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="row needs-validation">
+                            <div class="col-md-6">
+                                <label for="inputRecipientNumber" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="supplyName" required>
+                                <div class="invalid-feedback">
+                                    Please provide correct name
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="inputSuppliersNumber" class="form-label">Supply</label>
+                                <input type="number" class="form-control" id="supplyNumber" min="0" required>
+                                <div class="invalid-feedback">
+                                    Please provide correct supply
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="submitSupply">Submit</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <!--modal for recipents-->
+            <div class="modal fade" id="recipentModal" tabindex="-1" aria-labelledby="recipentModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="recipentModalLabel">Demand values</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="row needs-validation">
+                            <div class="col-md-6">
+                                <label for="inputRecipientNumber" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="recipentName" required>
+                                <div class="invalid-feedback">
+                                    Please provide correct name
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="inputSuppliersNumber" class="form-label">Demand</label>
+                                <input type="number" class="form-control" id="recipentNumber" min="0" required>
+                                <div class="invalid-feedback">
+                                    Please provide correct demand
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="submitRecipent">Submit</button>
                     </div>
                   </div>
                 </div>
