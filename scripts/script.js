@@ -245,9 +245,11 @@ var graph = document.getElementsByClassName("graph");
 var tablesResult = document.getElementsByClassName("tables-result");
 var table = document.getElementById("tableBody");
 
-var addTransportationBtn=document.getElementById("addTransportationBtn");
-var resetTransportationButton=document.getElementById("resetTransportation");
-var calculateTransportationButton=document.getElementById("calculateTransportationButton");
+var addTransportationBtn = document.getElementById("addTransportationBtn");
+var resetTransportationButton = document.getElementById("resetTransportation");
+var calculateTransportationButton = document.getElementById(
+  "calculateTransportationButton"
+);
 
 var counter = 1;
 let criticalPath = [];
@@ -471,37 +473,51 @@ function arrayRemove(arr, value) {
   });
 }
 
-function fillTransportationTable(rows, cols){
-  console.log(rows,cols)
-  var transportTable=document.getElementById("transportTable")
-  for(var i=0;i<rows+1;i++){
-    var row=document.createElement("tr");
-    if(i==0)
-      row.classList.add("headFields")
-    for(j=0;j<cols+1;j++){
-      var col=document.createElement("td");
-      if(i==0||j==0)
-        col.classList.add("headFields")
-      if(i==0&&j!=0)
-        col.textContent="R"+j;
-      if(i!=0&&j==0)
-        col.textContent="S"+i;
-      if(i==0&&j==0){
-        col.textContent="/"
-        col.contentEditable=false
+function fillTransportationTable(rows, cols) {
+  console.log(rows, cols);
+  var transportTable = document.getElementById("transportTable");
+  for (var i = 0; i < rows + 1; i++) {
+    var row = document.createElement("tr");
+    if (i == 0) row.classList.add("headFields");
+    for (j = 0; j < cols + 1; j++) {
+      var col = document.createElement("td");
+      if (i == 0 || j == 0) col.classList.add("headFields");
+      if (i == 0 && j != 0) {
+        col.textContent = "R" + j;
+        col.classList.add("recipentCell");
+        col.addEventListener("click", function (e) {
+          var myModalEl = document.querySelector('#recipentModal')
+          var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
+          myModalEl.setAttribute('data-recipent',e.target.id);
+          modal.show();
+        });
       }
-      col.id="R"+j+";"+"S"+i;
-      col.setAttribute("data-r",j)
-      col.setAttribute("data-s",i)
+      if (i != 0 && j == 0) {
+        col.textContent = "S" + i;
+        col.classList.add("supplierCell");
+        col.addEventListener("click", function (e) {
+          var myModalEl = document.querySelector('#supplierModal')
+          var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
+          myModalEl.setAttribute('data-supplier',e.target.id);
+          modal.show();
+        });
+      }
+      if (i == 0 && j == 0) {
+        col.textContent = "/";
+        col.contentEditable = false;
+      }
+      col.id = "R" + j + ";" + "S" + i;
+      col.setAttribute("data-r", j);
+      col.setAttribute("data-s", i);
       row.appendChild(col);
     }
-    transportTable.appendChild(row)
+    transportTable.appendChild(row);
   }
 }
 
-function cleanTransportationTable(){
-  var transportTable=document.getElementById("transportTable")
-  while (transportTable.hasChildNodes()) {  
+function cleanTransportationTable() {
+  var transportTable = document.getElementById("transportTable");
+  while (transportTable.hasChildNodes()) {
     transportTable.removeChild(transportTable.firstChild);
   }
 }
@@ -639,28 +655,64 @@ calculateBtn.addEventListener("click", function () {
     finalDuration = 0;
   }
 });
-addTransportationBtn.addEventListener("click", function(){
-  cleanTransportationTable()
-  var recipentsField=document.getElementById("inputRecipientNumber");
-  var suppliersField=document.getElementById("inputSuppliersNumber");
-  var transportationModal=document.getElementById("transportationModal");
-  transportationModal=bootstrap.Modal.getInstance(transportationModal)
+addTransportationBtn.addEventListener("click", function () {
+  cleanTransportationTable();
+  var recipentsField = document.getElementById("inputRecipientNumber");
+  var suppliersField = document.getElementById("inputSuppliersNumber");
+  var transportationModal = document.getElementById("transportationModal");
+  transportationModal = bootstrap.Modal.getInstance(transportationModal);
   //TODO: ADD A TOAST MSG WITH ERROR
-  if(recipentsField.value!==null&&recipentsField.value!=="" && suppliersField.value!==null&&suppliersField.value!==""){
-    var recipents=Number(recipentsField.value);
-    var suppliers=Number(suppliersField.value);
-    if(recipents<=7&&recipents>1 &&suppliers<=7&&suppliers>1){
+  if (
+    recipentsField.value !== null &&
+    recipentsField.value !== "" &&
+    suppliersField.value !== null &&
+    suppliersField.value !== ""
+  ) {
+    var recipents = Number(recipentsField.value);
+    var suppliers = Number(suppliersField.value);
+    if (recipents <= 7 && recipents > 1 && suppliers <= 7 && suppliers > 1) {
       transportationModal.hide();
-      fillTransportationTable(suppliers,recipents)
+      fillTransportationTable(suppliers, recipents);
     }
-  }
-  else{
-    console.log("error")
+  } else {
+    console.log("error");
   }
 });
-resetTransportationButton.addEventListener("click", function(){
+resetTransportationButton.addEventListener("click", function () {
   cleanTransportationTable();
 });
-calculateTransportationButton.addEventListener("click", function(){
-  alert("calculate")
+calculateTransportationButton.addEventListener("click", function () {
+  alert("calculate");
 });
+document.getElementById("submitSupply").addEventListener("click",function(e){
+  var myModalEl = document.querySelector('#supplierModal')
+  var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
+  var valuesFor = myModalEl.getAttribute('data-supplier');
+  var name = document.getElementById("supplyName").value
+  var number = document.getElementById("supplyNumber").value
+  console.log(valuesFor,name,number)
+
+  var cell=document.getElementById(valuesFor)
+  cell.textContent=name+': '+number;
+  cell.setAttribute('data-type','supplier')
+  cell.setAttribute('data-name',name)
+  cell.setAttribute('data-supplyNumber',number)
+
+  modal.hide();
+})
+document.getElementById("submitRecipent").addEventListener("click",function(e){
+  var myModalEl = document.querySelector('#recipentModal')
+  var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
+  var valuesFor = myModalEl.getAttribute('data-recipent');
+  var name = document.getElementById("recipentName").value
+  var number = document.getElementById("recipentNumber").value
+  console.log(valuesFor,name,number)
+
+  var cell=document.getElementById(valuesFor)
+  cell.textContent=name+': '+number;
+  cell.setAttribute('data-type','recipent')
+  cell.setAttribute('data-name',name)
+  cell.setAttribute('data-recipentNumber',number)
+
+  modal.hide();
+})
