@@ -169,6 +169,17 @@
                     <button type="button" id="calculateTransportationButton" class="btn btn-outline-primary col three">Calculate</button>
                 </div>
             </div>
+
+            <div class="container py-4">
+                <h2>Unit Profit Table</h2>
+                <div class="tables2">
+                    <div class="tableRight py-2 px-2">
+                        <table id="unitProfitTable" class="table tableInline">
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div class="container py-4">
                 <div class="about">
                     <h2>About</h2>
@@ -219,7 +230,7 @@
                     <div class="modal-body">
                         <form class="row needs-validation">
                             <div class="col-md-6">
-                                <label for="inputRecipientNumber" class="form-label">Name</label>
+                                <label for="inputRecipientNumber" class="form-label">Buy cost</label>
                                 <input type="text" class="form-control" id="supplyName" required>
                                 <div class="invalid-feedback">
                                     Please provide correct name
@@ -251,7 +262,7 @@
                     <div class="modal-body">
                         <form class="row needs-validation">
                             <div class="col-md-6">
-                                <label for="inputRecipientNumber" class="form-label">Name</label>
+                                <label for="inputRecipientNumber" class="form-label">Sell cost</label>
                                 <input type="text" class="form-control" id="recipentName" required>
                                 <div class="invalid-feedback">
                                     Please provide correct name
@@ -272,6 +283,7 @@
                   </div>
                 </div>
             </div>
+
         </div>
     </main>
     <footer class="pt-3">

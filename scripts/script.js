@@ -473,54 +473,10 @@ function arrayRemove(arr, value) {
   });
 }
 
-function fillTransportationTable(rows, cols) {
-  console.log(rows, cols);
-  var transportTable = document.getElementById("transportTable");
-  for (var i = 0; i < rows + 1; i++) {
-    var row = document.createElement("tr");
-    if (i == 0) row.classList.add("headFields");
-    for (j = 0; j < cols + 1; j++) {
-      var col = document.createElement("td");
-      if (i == 0 || j == 0) col.classList.add("headFields");
-      if (i == 0 && j != 0) {
-        col.textContent = "R" + j;
-        col.classList.add("recipentCell");
-        col.addEventListener("click", function (e) {
-          var myModalEl = document.querySelector('#recipentModal')
-          var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
-          myModalEl.setAttribute('data-recipent',e.target.id);
-          modal.show();
-        });
-      }
-      if (i != 0 && j == 0) {
-        col.textContent = "S" + i;
-        col.classList.add("supplierCell");
-        col.addEventListener("click", function (e) {
-          var myModalEl = document.querySelector('#supplierModal')
-          var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
-          myModalEl.setAttribute('data-supplier',e.target.id);
-          modal.show();
-        });
-      }
-      if (i == 0 && j == 0) {
-        col.textContent = "/";
-        col.contentEditable = false;
-      }
-      col.id = "R" + j + ";" + "S" + i;
-      col.setAttribute("data-r", j);
-      col.setAttribute("data-s", i);
-      row.appendChild(col);
-    }
-    transportTable.appendChild(row);
-  }
-}
 
-function cleanTransportationTable() {
-  var transportTable = document.getElementById("transportTable");
-  while (transportTable.hasChildNodes()) {
-    transportTable.removeChild(transportTable.firstChild);
-  }
-}
+
+
+
 
 addActivityBtn.addEventListener("click", function () {
   var row = document.createElement("tr");
@@ -655,6 +611,96 @@ calculateBtn.addEventListener("click", function () {
     finalDuration = 0;
   }
 });
+
+
+
+// MIDDLE MAN METHOD STUFF
+
+// global variables for middleman method
+var numOfSuppliers;
+var numOfRecipients;
+var demand;
+var supply;
+var buyVal;
+var sellVal;
+var transportCost;
+var unitProfitTable;
+var alpha;
+var beta;
+var distribution;
+
+
+function getInput() {
+  var table = document.getElementById("transportTable");
+  for (var i = 1, row; row = table.rows[i]; i++) {
+   //iterate through rows
+   //rows would be accessed using the "row" variable assigned in the for loop
+    for (var j = 1, col; col = row.cells[j]; j++) {
+     //iterate through columns
+     //columns would be accessed using the "col" variable assigned in the for loop
+      transportCost[i-1][j-1] = col.textContent;
+      console.log(transportCost[i-1][j-1]);
+    }  
+  }
+}
+
+function fillTransportationTable(rows, cols) {
+  console.log(rows, cols);
+  var transportTable = document.getElementById("transportTable");
+  for (var i = 0; i < rows + 1; i++) {
+    var row = document.createElement("tr");
+    if (i == 0) row.classList.add("headFields");
+    for (j = 0; j < cols + 1; j++) {
+      var col = document.createElement("td");
+      if (i == 0 || j == 0) col.classList.add("headFields");
+      if (i == 0 && j != 0) {
+        col.textContent = "R" + j;
+        col.classList.add("recipentCell");
+        col.addEventListener("click", function (e) {
+          var myModalEl = document.querySelector('#recipentModal')
+          var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
+          myModalEl.setAttribute('data-recipent',e.target.id);
+          modal.show();
+        });
+      }
+      if (i != 0 && j == 0) {
+        col.textContent = "S" + i;
+        col.classList.add("supplierCell");
+        col.addEventListener("click", function (e) {
+          var myModalEl = document.querySelector('#supplierModal')
+          var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
+          myModalEl.setAttribute('data-supplier',e.target.id);
+          modal.show();
+        });
+      }
+      if (i == 0 && j == 0) {
+        col.textContent = "/";
+        col.contentEditable = false;
+      }
+      col.id = "R" + j + ";" + "S" + i;
+      col.setAttribute("data-r", j);
+      col.setAttribute("data-s", i);
+      row.appendChild(col);
+    }
+    transportTable.appendChild(row);
+  }
+}
+
+function cleanTransportationTable() {
+  var transportTable = document.getElementById("transportTable");
+  while (transportTable.hasChildNodes()) {
+    transportTable.removeChild(transportTable.firstChild);
+  }
+}
+
+function cleanUnitProfitTable() {
+  var unitTable = document.getElementById("unitProfitTable");
+  while (unitTable.hasChildNodes()) {
+    unitTable.removeChild(unitTable.firstChild);
+  }
+}
+
+
 addTransportationBtn.addEventListener("click", function () {
   cleanTransportationTable();
   var recipentsField = document.getElementById("inputRecipientNumber");
@@ -670,20 +716,121 @@ addTransportationBtn.addEventListener("click", function () {
   ) {
     var recipents = Number(recipentsField.value);
     var suppliers = Number(suppliersField.value);
+
     if (recipents <= 7 && recipents > 1 && suppliers <= 7 && suppliers > 1) {
       transportationModal.hide();
       fillTransportationTable(suppliers, recipents);
+
+      // setting global values
+      numOfRecipients = recipents;
+      console.log(numOfRecipients);
+      numOfSuppliers = suppliers;
+      console.log(numOfSuppliers);
+      demand = new Array(numOfRecipients + 1);
+      supply = new Array(numOfSuppliers + 1);
+      buyVal = new Array(numOfSuppliers);
+      sellVal = new Array(numOfRecipients);
+      transportCost = new Array(numOfSuppliers);
+      unitProfitTable = new Array(numOfSuppliers + 1);
+      for (var i = 0; i < numOfSuppliers; i++) {
+        transportCost[i] = new Array(numOfRecipients);
+      }
+      for (var i = 0; i < numOfSuppliers + 1; i++) {
+        unitProfitTable[i] = new Array(numOfRecipients + 1);
+      }
+
+
     }
   } else {
     console.log("error");
   }
 });
+
 resetTransportationButton.addEventListener("click", function () {
   cleanTransportationTable();
+  cleanUnitProfitTable();
 });
+
+function createUnitProfitTable() {
+  
+  // after that unitProfitTable is populated and ready to be created in HTML
+  for (var i = 0; i < numOfSuppliers + 1; i++) {
+    for (var j = 0; j < numOfRecipients + 1; j++) {
+      //in case of fictional supplier/recipient value is set to 0
+      if (i == numOfSuppliers || j == numOfRecipients) {
+        unitProfitTable[i][j] = 0;  
+      } else {
+        unitProfitTable[i][j] = sellVal[j] - buyVal[i] - transportCost[i][j];
+      }
+      
+    }
+  }
+
+}
+
+function createUnitProfitTableHTML() {
+  var table = document.getElementById("unitProfitTable");
+
+  for (var i = 0; i < numOfSuppliers + 2; i++) {
+    var tr = document.createElement("tr");
+
+    for (var j = 0; j < numOfRecipients + 2; j++) {
+
+      var td = document.createElement("td");
+
+      if (i==0 && j>0) {
+        if (j == (numOfRecipients + 1)) {
+          td.innerText = `FR`;
+          td.classList.add("headFields");
+        } else {
+          td.innerText = `R${j}`;
+          td.classList.add("headFields");
+        }
+      } else if (i>0 && j==0) {
+        if (i == (numOfSuppliers + 1)) {
+          td.innerText = `FS`;
+          td.classList.add("headFields");
+        } else {
+          td.innerText = `S${i}`;
+          td.classList.add("headFields");
+        }
+      } else if (i>0 && j>0) { 
+        td.innerText = unitProfitTable[i-1][j-1];
+      }
+
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+}
+
+
 calculateTransportationButton.addEventListener("click", function () {
-  alert("calculate");
+  getInput();
+  cleanUnitProfitTable();
+  createUnitProfitTable();
+  createUnitProfitTableHTML();
+  console.log('unitProfitTable:');
+  for (var i = 0; i < numOfSuppliers; i++) {
+    for (var j = 0; j < numOfRecipients; j++) {
+      console.log(unitProfitTable[i][j]);
+    }
+  }
+  console.log('buyVal:');
+  for ( var i = 0; i < numOfSuppliers; i++ ) {
+    console.log(buyVal[i]);
+  }
+  console.log('sellVal:');
+  for ( var i = 0; i < numOfRecipients; i++ ) {
+    console.log(sellVal[i]);
+  }
+
 });
+
+function middleManAlgorithm() {
+
+}
+
 document.getElementById("submitSupply").addEventListener("click",function(e){
   var myModalEl = document.querySelector('#supplierModal')
   var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
@@ -692,7 +839,16 @@ document.getElementById("submitSupply").addEventListener("click",function(e){
   var number = document.getElementById("supplyNumber").value
   console.log(valuesFor,name,number)
 
+
   var cell=document.getElementById(valuesFor)
+
+  var i = cell.getAttribute('data-s');
+  console.log(i);
+  buyVal[i - 1] = name;
+  console.log(buyVal[i-1]);
+  supply[i - 1] = number;
+  console.log(supply[i-1]);
+
   cell.textContent=name+': '+number;
   cell.setAttribute('data-type','supplier')
   cell.setAttribute('data-name',name)
@@ -700,6 +856,7 @@ document.getElementById("submitSupply").addEventListener("click",function(e){
 
   modal.hide();
 })
+
 document.getElementById("submitRecipent").addEventListener("click",function(e){
   var myModalEl = document.querySelector('#recipentModal')
   var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
@@ -709,6 +866,14 @@ document.getElementById("submitRecipent").addEventListener("click",function(e){
   console.log(valuesFor,name,number)
 
   var cell=document.getElementById(valuesFor)
+
+  var i = cell.getAttribute('data-r');
+  console.log(i);
+  sellVal[i - 1] = name;
+  console.log(sellVal[i - 1]);
+  demand[i - 1] = number;
+  console.log(demand[i - 1]);
+
   cell.textContent=name+': '+number;
   cell.setAttribute('data-type','recipent')
   cell.setAttribute('data-name',name)
@@ -716,3 +881,65 @@ document.getElementById("submitRecipent").addEventListener("click",function(e){
 
   modal.hide();
 })
+
+function isFilled(table) {
+  for (var i = 0; i < table.length; i++) {
+    if(table[i] == null)
+        return false;
+  }
+  return true;
+}
+
+function findMax() {
+  var indices = new Array(2);
+  indices.fill(0);
+
+  unitProfitTable[indices[0]][indices[1]];
+  for (var i = 0; i < numOfSuppliers; i++) {
+    for (var j = 0; j < numOfRecipients; j++) {
+      if(unitProfitTable[i][j]);
+    }
+  }
+}
+
+function calculateDistribution() {
+
+}
+
+function calculateOptRatios() {
+  alpha = new Array(numOfSuppliers);
+  beta = new Array(numOfRecipients);
+  alpha.fill(null);
+  beta.fill(null);
+
+  while (!isFilled(alpha) || !isFilled(beta)) {
+    for(var i = 0; i < alpha.length; i++) {
+      if(alpha[i] != null) {
+          for(var j = 0; j < beta.length; j++) {
+              if(beta[j] != null)
+                  continue;
+
+              if(distribution[i][j] == null)
+                  continue;
+
+              beta[j] = unitProfitTable[i][j] - alpha[i];
+          }
+      }
+    }
+
+    for(var i = 0; i < beta.length; i++) {
+      if(beta[i] != null) {
+          for(var j = 0; j < alpha.length; j++) {
+              if(alpha[j] != null)
+                  continue;
+
+              if(distribution[j][i] == null)
+                  continue;
+
+              alpha[j] = unitProfitTable[j][i] - beta[i];
+          }
+        
+      }
+    }
+  }
+}
